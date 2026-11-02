@@ -6,7 +6,7 @@ import * as art from '../art.js';
 import { makeBg } from '../bg.js';
 
 export const DUR = 8.6;
-const PX = 40, PY = 444;            // chat panel origin (screen px)
+const PX = 40, PY = 416;            // chat panel origin (screen px)
 const IRIS = { x: 540, y: 1300 };   // iris-open origin
 const MSG = 'Daun cabai saya keriting, kenapa ya?';
 const AI_TXT = [['Itu tanda ', 0], ['serangan kutu kebul', 1], [' atau kurang unsur hara. Semprot ', 0], ['insektisida nabati', 1], [' tiap 3 hari, lalu beri ', 0], ['pupuk NPK', 1], [' untuk memulihkan daun.', 0]];
@@ -16,8 +16,7 @@ export function create(root) {
   const clip = h('div', { class: 'fill' });
   const bgs = makeBg({ dark: true });
   const bg = bgs.el;
-  const tag = h('div', { class: 's3-tag', html: '<i></i>03 · TANYA TANI AI' });
-  const head = C.kinetic([{ text: 'Tanya apa saja.' }, { text: 'Dijawab AI.', accent: true }], { x: 66, y: 178, size: 100, lh: 1.02, color: '#F2FAF3', accent: '#8FE184' });
+  const head = C.kinetic([{ text: 'Tanya apa saja.' }, { text: 'Dijawab AI.', accent: true }], { x: 66, y: 142, size: 100, lh: 1.02, color: '#F2FAF3', accent: '#8FE184' });
 
   // ---- 3D world with panel + independent layers above it
   const cam = h('div', { class: 'cam' });
@@ -101,7 +100,7 @@ export function create(root) {
   const dim = h('div', { class: 'fill', style: 'background:#021009;opacity:0;pointer-events:none' });
   const ring = h('div', { class: 's3-iris' });
 
-  clip.append(bg, cam, tag, head.el, dim);
+  clip.append(bg, cam, head.el, dim);
   el.append(clip, ring);
   root.append(el);
 
@@ -123,7 +122,6 @@ export function create(root) {
     bgs.update(tAbs, { lines: 1 });
 
     // ---------- type
-    T(tag, { y: (1 - tw(t, 0.45, 0.8)) * -30, o: tw(t, 0.45, 0.5, E.lin) * (1 - pr(t, 7.4, 0.3)) });
     head.set(t, 0.5, 7.3, E);
 
     // ---------- camera

@@ -25,8 +25,6 @@
 .s2-orb.a { left: -420px; top: 180px; }
 .s2-orb.b { left: 380px; top: 960px; background: radial-gradient(circle, rgba(46,107,60,.22) 0%, rgba(46,107,60,0) 66%); }
 .s2-bigword { position: absolute; left: 0; top: 700px; font-family: 'NSX'; font-weight: 900; font-size: 640px; line-height: 1; white-space: nowrap; color: rgba(46,107,60,.07); letter-spacing: -.01em; }
-.s2-tag { position: absolute; left: 66px; top: 96px; display: inline-flex; align-items: center; height: 54px; padding: 0 26px 0 22px; border-radius: 27px; background: rgba(46,107,60,.10); color: var(--brand); font-size: 25px; font-weight: 700; letter-spacing: .16em; }
-.s2-tag i { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--leaf); margin-right: 14px; box-shadow: 0 0 0 6px rgba(88,174,80,.25); }
 .s2-pop { position: absolute; left: 440px; top: 860px; width: 200px; height: 200px; border-radius: 50%; border: 8px solid rgba(46,107,60,.4); opacity: 0; }
 .s2-cam { -webkit-mask-image: linear-gradient(180deg, transparent 575px, #000 680px); mask-image: linear-gradient(180deg, transparent 575px, #000 680px); }
 .touch { width: 96px; height: 96px; border-radius: 50%; border: 5px solid rgba(255,255,255,.95); background: radial-gradient(circle, rgba(30,60,40,.38), rgba(30,60,40,.2)); box-shadow: 0 10px 34px rgba(0,0,0,.35); display: none; }
@@ -59,8 +57,6 @@
 .s3-bg { background: radial-gradient(ellipse 95% 62% at 50% 56%, #0F4D30 0%, #08301F 44%, #04140D 84%); }
 .s3-glow { position: absolute; left: -100px; top: 380px; width: 1280px; height: 1280px; border-radius: 50%; background: radial-gradient(circle, rgba(120,235,140,.40) 0%, rgba(60,180,100,.14) 40%, rgba(0,0,0,0) 68%); mix-blend-mode: screen; }
 .s3-bigword { position: absolute; left: 0; top: 560px; font-family: 'NSX'; font-weight: 900; font-size: 760px; line-height: 1; white-space: nowrap; color: rgba(143,225,132,.055); }
-.s3-tag { position: absolute; left: 66px; top: 96px; display: inline-flex; align-items: center; height: 54px; padding: 0 26px 0 22px; border-radius: 27px; background: rgba(143,225,132,.14); color: #A8EE9E; font-size: 25px; font-weight: 700; letter-spacing: .16em; }
-.s3-tag i { display: block; width: 14px; height: 14px; border-radius: 50%; background: #8FE184; margin-right: 14px; box-shadow: 0 0 0 6px rgba(143,225,132,.25); }
 .s3-iris { position: absolute; border-radius: 50%; border: 6px solid rgba(190,255,200,.9); box-shadow: 0 0 60px rgba(130,255,160,.8), inset 0 0 60px rgba(130,255,160,.5); pointer-events: none; display: none; }
 .c-rec .th2 { width: 104px; height: 104px; border-radius: 26px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
 .c-rec .th2 svg { flex: none; }

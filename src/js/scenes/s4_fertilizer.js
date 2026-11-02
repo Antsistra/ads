@@ -21,8 +21,7 @@ export function create(root) {
   const clip = h('div', { class: 'fill' });
   const bgs = makeBg({});
   const bg = bgs.el;
-  const tag = h('div', { class: 's2-tag', html: '<i></i>04 · REKOMENDASI PUPUK' });
-  const head = C.kinetic([{ text: 'Pupuk tepat,' }, { text: 'dosis pas.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
+  const head = C.kinetic([{ text: 'Pupuk tepat,' }, { text: 'dosis pas.', accent: true }], { x: 66, y: 140, size: 104, lh: 1.02 });
   const edge = h('div', { class: 's4-edge' });
 
   const cam = h('div', { class: 'cam' });
@@ -113,7 +112,7 @@ export function create(root) {
   const sparks = Array.from({ length: 14 }, (_, i) => { const d = h('div', { class: 'p3 burst', style: 'left:0;top:0', html: icon(i % 2 ? 'sparkle' : 'leaf', 34, { filled: true, color: i % 2 ? '#FFC53D' : '#58AE50' }) }); world.append(d); return d; });
   const R = rng(4); const sa = sparks.map(() => R() * 6.283), sd = sparks.map(() => 160 + R() * 240);
 
-  clip.append(bg, cam, tag, head.el);
+  clip.append(bg, cam, head.el);
   el.append(clip, edge);
   root.append(el);
 
@@ -146,7 +145,6 @@ export function create(root) {
     // ---------- background (shared system)
     bgs.update(tAbs, { lines: 1 });
     const exitT = 6.2;
-    T(tag, { y: (1 - tw(t, 0.3, 0.8)) * -30, o: tw(t, 0.3, 0.5, E.lin) * (1 - pr(t, exitT, 0.3)) });
     head.set(t, 0.4, exitT, E);
 
     // ---------- camera
@@ -156,7 +154,7 @@ export function create(root) {
     const z = lerp(-80, 40, o1) - tw(t, 3.3, 0.7, E.inOut) * 60 + o2 * 70 - exit * 420;
     const rx = lerp(10, 3, o1) + (o2 * -2) + exit * 12;
     const ry = lerp(-18, 6, o1) + lerp(0, -14, tw(t, 3.4, 1.4, E.inOutSoft)) + lerp(0, 18, o2) + exit * 28;
-    world.style.transform = `translate3d(0,${-exit * 60}px,${z}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    world.style.transform = `translate3d(0,${-28 - exit * 60}px,${z}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
 
     // ---------- FORM items
     const recede = tw(t, 3.25, 0.55, E.inOut);

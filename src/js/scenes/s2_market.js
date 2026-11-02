@@ -10,9 +10,8 @@ export const DUR = 7.7;
 export function create(root) {
   const el = h('div', { class: 'scene', id: 's2' });
   const bg = makeBg({});
-  const tag = h('div', { class: 's2-tag', html: '<i></i>01 · MARKETPLACE' });
-  const headA = C.kinetic([{ text: 'Belanja' }, { text: 'kebutuhan' }, { text: 'tani.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
-  const headB = C.kinetic([{ text: 'Pupuk, benih,' }, { text: 'hingga peralatan.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
+  const headA = C.kinetic([{ text: 'Belanja' }, { text: 'kebutuhan' }, { text: 'tani.', accent: true }], { x: 66, y: 140, size: 104, lh: 1.02 });
+  const headB = C.kinetic([{ text: 'Pupuk, benih,' }, { text: 'hingga peralatan.', accent: true }], { x: 66, y: 140, size: 104, lh: 1.02 });
 
   // ---------------- BUY world ----------------
   const camA = h('div', { class: 'cam s2-cam' });
@@ -67,7 +66,7 @@ export function create(root) {
   const chipX = []; let cx0 = 60; chipDefs.forEach(([, , w]) => { chipX.push(cx0); cx0 += w + 14; });
   const chips = chipDefs.map(([n, ic, w], i) => {
     const e = h('div', { class: 'u cat-chip', style: `width:${w}px`, html: icon(ic, 36, { filled: ic !== 'tools' && ic !== 'grass' && ic !== 'leaf', sw: 1.9 }) + `<span>${n}</span>` });
-    return addB(worldB, e, chipX[i], 660, 60, 3.95 + i * 0.07, { dy: 200, dz: -300, rx: 30 }, { chip: i });
+    return addB(worldB, e, chipX[i], 560, 60, 3.95 + i * 0.07, { dy: 200, dz: -300, rx: 30 }, { chip: i });
   });
 
   // product grid (scrolls)
@@ -87,7 +86,7 @@ export function create(root) {
     const pc = C.prodCard({ title, price, unit, art: a, bg: bgc });
     pc.el.classList.add('cat-card');
     const row = i >> 1, col = i & 1;
-    const o = addB(grid, pc.el, 60 + col * 492, 790 + row * 466, 70, 4.15 + row * 0.12 + col * 0.08, { dy: 700, dz: -600, rx: 40, rz: col ? 5 : -5 }, { card: true, row, h: 430 });
+    const o = addB(grid, pc.el, 60 + col * 492, 690 + row * 466, 70, 4.15 + row * 0.12 + col * 0.08, { dy: 700, dz: -600, rx: 40, rz: col ? 5 : -5 }, { card: true, row, h: 430 });
     return o;
   });
   const navB = addB(worldB, C.nav('home'), 60, 1736, 150, 4.5, { dy: 300, dz: -300, rx: 35 });
@@ -95,7 +94,7 @@ export function create(root) {
   const ripB = h('div', { class: 'p3 tap-rip', style: 'left:0;top:0' });
   worldB.append(touchB, ripB);
 
-  el.append(bg.el, camA, camB, tag, headA.el, headB.el);
+  el.append(bg.el, camA, camB, headA.el, headB.el);
   root.append(el);
 
   const posOf = (o, t) => {
@@ -112,11 +111,9 @@ export function create(root) {
     // ------- background (shared system; identical to the intro's so the window push-through is seamless)
     bg.update(tAbs, { lines: 1 });
 
-    // ------- headline & tag
-    T(tag, { y: (1 - tw(t, 0.25, 0.8)) * -30, o: tw(t, 0.25, 0.5, E.lin) * (1 - pr(t, 3.6, 0.3)) });
+    // ------- headline
     headA.set(t, 0.35, 3.55, E);
     headB.set(t, 4.0, 6.85, E);
-    if (t > 3.9) { tag.innerHTML = '<i></i>02 · KATALOG LENGKAP'; tag.style.opacity = String(tw(t, 3.95, 0.5, E.lin) * (1 - pr(t, 6.8, 0.3))); }
 
     // ------- BUY world visibility
     const buyOn = t < 4.15;
@@ -129,7 +126,7 @@ export function create(root) {
       const orbit = tw(t, 0.2, 4.0, E.inOutSoft);
       const exitA = tw(t, 3.7, 0.5, E.inOut);
       worldA.style.transformOrigin = '540px 1250px';
-      worldA.style.transform = `translate3d(0,${-exitA * 80}px,${lerp(-60, 60, orbit) - exitA * 500}px) rotateX(${lerp(14, 3, orbit) + exitA * 14}deg) rotateY(${lerp(-22, 14, orbit) + exitA * 30}deg)`;
+      worldA.style.transform = `translate3d(0,${-30 - exitA * 80}px,${lerp(-60, 60, orbit) - exitA * 500}px) rotateX(${lerp(14, 3, orbit) + exitA * 14}deg) rotateY(${lerp(-22, 14, orbit) + exitA * 30}deg)`;
       camA.style.opacity = String(1 - pr(t, 3.75, 0.35));
       const scP = tw(t, 1.95, 0.8, E.inOutSoft);
       for (const o of P) { if (o.t0 > 90) continue; const q = posOf(o, t); if (o.top) q.o *= 1 - clamp(scP * 1.5); T(o.el, q); }
@@ -206,7 +203,7 @@ export function create(root) {
       cards.forEach((o) => {
         const q = posOf(o, t);
         const ys = o.by + scr;
-        q.o *= clamp((ys + o.h - 800) / 110);        // cards leave softly under the tab bar
+        q.o *= clamp((ys + o.h - 700) / 110);        // cards leave softly under the tab bar
         // cards of the selected category lift slightly
         const secRow = active === 2 ? [2, 3] : active === 3 ? [4, 5] : active === 5 ? [6, 7] : [0, 1];
         const idx = cards.indexOf(o);
@@ -217,14 +214,14 @@ export function create(root) {
       T(navB.el, posOf(navB, t));
 
       // touch
-      const pts = [[3.95, 880, 1100], [4.9, 520, 704], [5.55, 520, 704], [5.75, 454, 704], [6.4, 454, 704], [6.5, 924, 704], [6.9, 924, 704]];
+      const pts = [[3.95, 880, 1000], [4.9, 520, 604], [5.55, 520, 604], [5.75, 454, 604], [6.4, 454, 604], [6.5, 924, 604], [6.9, 924, 604]];
       const kfp = (() => { for (let i = 1; i < pts.length; i++) if (t <= pts[i][0]) { const A = pts[i - 1], B = pts[i], p = E.inOutSoft(clamp((t - A[0]) / (B[0] - A[0]))); return [lerp(A[1], B[1], p), lerp(A[2], B[2], p)]; } return [pts[pts.length - 1][1], pts[pts.length - 1][2]]; })();
       const press = Math.max(...taps.map((ta) => pulse(t, ta, 0.22)));
       const vis = clamp((t - 4.45) / 0.3) * (1 - pr(t, 6.85, 0.2));
       touchB.style.display = 'block';
       T(touchB, { x: kfp[0] - 48, y: kfp[1] - 48, z: 260, s: (1 - press * 0.28), o: vis });
       let best = null; taps.forEach((ta, k) => { const p = pr(t, ta, 0.5); if (p > 0 && p < 1) best = [p, k]; });
-      if (best) { const cxp = [510, 454, 924][best[1]]; T(ripB, { x: cxp - 60, y: 704 - 60, z: 255, s: lerp(0.3, 1.8, E.expoOut(best[0])), o: (1 - best[0]) * 0.7 }); } else T(ripB, { o: 0 });
+      if (best) { const cxp = [510, 454, 924][best[1]]; T(ripB, { x: cxp - 60, y: 604 - 60, z: 255, s: lerp(0.3, 1.8, E.expoOut(best[0])), o: (1 - best[0]) * 0.7 }); } else T(ripB, { o: 0 });
     }
   }
   return { el, update, dur: DUR };
