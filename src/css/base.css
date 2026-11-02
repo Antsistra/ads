@@ -1,0 +1,45 @@
+@font-face { font-family: 'NS'; src: url('/assets/fonts/NotoSans-VF.ttf'); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: 'NSX'; src: url('/assets/fonts/NotoSans-ExtraCondensedBlack.ttf'); font-weight: 900; }
+@font-face { font-family: 'NSX'; src: url('/assets/fonts/NotoSans-ExtraCondensedBold.ttf'); font-weight: 700; }
+
+:root {
+  --ink: #0F1A13;
+  --muted: #5B6A60;
+  --brand: #2E6B3C;
+  --brand-deep: #0B6B3E;
+  --deep: #0A3D26;
+  --night: #04140D;
+  --mint: #E7F2EA;
+  --mint-2: #DAEADD;
+  --leaf: #58AE50;
+  --lime: #9BE38F;
+  --wa: #1FD167;
+  --paper: #F6F9F6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+body { font-family: 'NS', 'Noto Sans', sans-serif; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; font-synthesis: none; }
+
+#stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+.scene { position: absolute; inset: 0; overflow: hidden; }
+.abs { position: absolute; }
+.fill { position: absolute; inset: 0; }
+.center { display: flex; align-items: center; justify-content: center; }
+.ic { display: block; flex: none; }
+canvas.fx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+
+/* camera rig for 3D scenes */
+.cam { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 50% 46%; }
+.world { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-style: preserve-3d; transform-origin: 540px 960px; }
+.p3 { position: absolute !important; backface-visibility: hidden; }
+.p3.g3 { transform-style: preserve-3d; }
+
+/* masks for kinetic type */
+.mask { overflow: hidden; display: block; }
+.line { display: block; white-space: nowrap; }
+
+/* global finishing */
+#grain { position: absolute; inset: -200px; background-image: url('/assets/img/grain.png'); background-size: 512px 512px; opacity: .10; mix-blend-mode: overlay; pointer-events: none; }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 58%, rgba(0,0,0,.28) 100%); }
+#fade { position: absolute; inset: 0; background: #000; pointer-events: none; opacity: 0; }

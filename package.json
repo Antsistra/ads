@@ -1,0 +1,15 @@
+{
+  "name": "umah-tani-promo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "30s 1080x1920 promo video for Umah Tani. Deterministic HTML/SVG/Canvas composition rendered with headless Chrome.",
+  "type": "module",
+  "scripts": {
+    "assets": "node tools/make-assets.mjs",
+    "preview": "node tools/shot.mjs",
+    "audio": "node tools/audio.mjs",
+    "frames": "node tools/render-frames.mjs",
+    "encode": "node tools/encode.mjs",
+    "build": "node tools/make-assets.mjs && node tools/audio.mjs && node tools/render-frames.mjs && node tools/encode.mjs"
+  }
+}

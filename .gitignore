@@ -1,0 +1,6 @@
+frames/
+.home/
+node_modules/
+out/preview/
+out/*.png
+out/render.log

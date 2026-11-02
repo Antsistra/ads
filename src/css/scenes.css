@@ -1,0 +1,96 @@
+/* ============ SCENE 1 — logo reveal ============ */
+.s1-bg { background:
+  radial-gradient(ellipse 80% 55% at 50% 40%, #0F4A2E 0%, #08301F 38%, #04140D 80%),
+  #04140D; }
+.s1-shaft { position: absolute; top: -300px; width: 220px; height: 2600px; transform-origin: 50% 0;
+  background: linear-gradient(90deg, rgba(120,255,160,0), rgba(120,255,160,.13), rgba(120,255,160,0)); mix-blend-mode: screen; }
+.s1-glow { position: absolute; left: 40px; top: 190px; width: 1000px; height: 1000px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(130,255,150,.65) 0%, rgba(70,200,110,.28) 32%, rgba(0,0,0,0) 68%); mix-blend-mode: screen; opacity: 0; }
+.s1-wave { position: absolute; left: 340px; top: 540px; width: 400px; height: 400px; border-radius: 50%;
+  border: 3px solid rgba(190,255,200,.9); box-shadow: 0 0 40px rgba(130,255,160,.6), inset 0 0 40px rgba(130,255,160,.4); opacity: 0; }
+.s1-flare { position: absolute; left: 0; top: 735px; width: 1080px; height: 8px;
+  background: linear-gradient(90deg, rgba(160,255,190,0), rgba(190,255,210,.95) 50%, rgba(160,255,190,0)); filter: blur(2px); mix-blend-mode: screen; opacity: 0; }
+.s1-word { position: absolute; left: 0; width: 1080px; top: 1110px; text-align: center; }
+.s1-word-mask { padding: 20px 0 40px; margin: -20px 0 -40px; }
+.s1-word .split { font-size: 172px; line-height: 1.1; font-weight: 800; color: #F2FAF3; white-space: nowrap; display: inline-block; }
+.s1-word .tani { color: #8FE184; }
+.s1-sub { position: absolute; left: 0; width: 1080px; top: 1334px; text-align: center; font-size: 29px; font-weight: 600; letter-spacing: .46em; color: rgba(225,245,228,.78); padding-left: .46em; }
+.s1-rule { position: absolute; top: 1350px; height: 2px; width: 110px; background: linear-gradient(90deg, rgba(143,225,132,0), rgba(143,225,132,.85)); }
+.s1-rule.l { left: 30px; transform-origin: 100% 50%; }
+.s1-rule.r { right: 30px; transform-origin: 0% 50%; background: linear-gradient(270deg, rgba(143,225,132,0), rgba(143,225,132,.85)); }
+
+/* ============ SCENE 2 — marketplace ============ */
+.s2-bg { background: #fff; }
+.s2-orb { position: absolute; width: 1000px; height: 1000px; border-radius: 50%; background: radial-gradient(circle, rgba(88,174,80,.30) 0%, rgba(88,174,80,0) 66%); }
+.s2-orb.a { left: -420px; top: 180px; }
+.s2-orb.b { left: 380px; top: 960px; background: radial-gradient(circle, rgba(46,107,60,.22) 0%, rgba(46,107,60,0) 66%); }
+.s2-bigword { position: absolute; left: 0; top: 700px; font-family: 'NSX'; font-weight: 900; font-size: 640px; line-height: 1; white-space: nowrap; color: rgba(46,107,60,.07); letter-spacing: -.01em; }
+.s2-tag { position: absolute; left: 66px; top: 96px; display: inline-flex; align-items: center; height: 54px; padding: 0 26px 0 22px; border-radius: 27px; background: rgba(46,107,60,.10); color: var(--brand); font-size: 25px; font-weight: 700; letter-spacing: .16em; }
+.s2-tag i { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--leaf); margin-right: 14px; box-shadow: 0 0 0 6px rgba(88,174,80,.25); }
+.s2-pop { position: absolute; left: 440px; top: 860px; width: 200px; height: 200px; border-radius: 50%; border: 8px solid rgba(46,107,60,.4); opacity: 0; }
+.s2-cam { -webkit-mask-image: linear-gradient(180deg, transparent 575px, #000 680px); mask-image: linear-gradient(180deg, transparent 575px, #000 680px); }
+.touch { width: 96px; height: 96px; border-radius: 50%; border: 5px solid rgba(255,255,255,.95); background: radial-gradient(circle, rgba(30,60,40,.38), rgba(30,60,40,.2)); box-shadow: 0 10px 34px rgba(0,0,0,.35); display: none; }
+.fly-thumb { width: 64px; height: 64px; border-radius: 50%; background: #fff; box-shadow: 0 10px 26px rgba(0,0,0,.3); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--brand); visibility: hidden; }
+.fly-thumb svg { flex: none; }
+.tap-rip { width: 120px; height: 120px; border-radius: 50%; border: 6px solid rgba(255,255,255,.9); box-shadow: 0 0 0 4px rgba(46,107,60,.5); }
+.burst { width: 34px; height: 34px; }
+
+.sell-card { width: 960px; border-radius: 46px; background: #fff; overflow: hidden; box-shadow: 0 50px 110px rgba(5,40,20,.28), 0 10px 24px rgba(5,40,20,.12); padding-bottom: 40px; position: relative; }
+.sell-im { position: relative; height: 300px; background: linear-gradient(160deg, #FDF1DB, #F5E2BE); overflow: hidden; }
+.sell-chip { position: absolute; left: 30px; top: 30px; height: 58px; padding: 0 26px 0 20px; border-radius: 29px; background: #1FA55A; color: #fff; font-size: 27px; font-weight: 700; display: flex; align-items: center; gap: 10px; transform-origin: 0 50%; }
+.sell-body { padding: 30px 44px 26px; }
+.sell-t { font-size: 52px; font-weight: 800; letter-spacing: -.01em; }
+.sell-meta { display: flex; gap: 14px; margin-top: 18px; }
+.sell-meta span { display: inline-flex; align-items: center; gap: 10px; height: 62px; padding: 0 24px 0 18px; border-radius: 31px; background: #EAF2EB; color: #1e3a27; font-size: 28px; font-weight: 600; }
+.sell-row { display: flex; align-items: baseline; gap: 14px; margin-top: 22px; }
+.sell-price { font-size: 78px; font-weight: 800; color: var(--brand); letter-spacing: -.02em; transform-origin: 0 100%; }
+.sell-row small { font-size: 34px; color: var(--muted); font-weight: 500; }
+.sell-stamp { position: absolute; right: 36px; top: 232px; padding: 14px 30px 14px 20px; border-radius: 26px; background: #1FA55A; color: #fff; display: flex; align-items: center; gap: 14px; font-size: 44px; font-weight: 900; letter-spacing: .02em; box-shadow: 0 18px 40px rgba(31,165,90,.5); border: 5px solid #fff; }
+.toast { width: 900px; height: 144px; border-radius: 40px; background: #fff; display: flex; align-items: center; gap: 24px; padding: 0 34px 0 28px; box-shadow: 0 30px 70px rgba(5,40,20,.3), 0 6px 16px rgba(5,40,20,.12); }
+.toast .av { width: 88px; height: 88px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 32px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.toast .tx b { display: block; font-size: 33px; font-weight: 700; }
+.toast .tx span { display: block; font-size: 27px; color: var(--muted); margin-top: 4px; }
+.toast .am { margin-left: auto; font-size: 34px; font-weight: 800; color: var(--brand); }
+.sell-rev { width: 960px; height: 138px; border-radius: 44px; background: linear-gradient(120deg, #0B5A36, #2E8B43); color: #fff; padding: 0 48px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 30px 70px rgba(11,90,54,.5); }
+.sell-rev small { font-size: 26px; opacity: .85; font-weight: 500; }
+.sell-rev b { font-size: 70px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+
+/* ============ SCENE 3 — Tanya Tani AI ============ */
+.s3-bg { background: radial-gradient(ellipse 95% 62% at 50% 56%, #0F4D30 0%, #08301F 44%, #04140D 84%); }
+.s3-glow { position: absolute; left: -100px; top: 380px; width: 1280px; height: 1280px; border-radius: 50%; background: radial-gradient(circle, rgba(120,235,140,.40) 0%, rgba(60,180,100,.14) 40%, rgba(0,0,0,0) 68%); mix-blend-mode: screen; }
+.s3-bigword { position: absolute; left: 0; top: 560px; font-family: 'NSX'; font-weight: 900; font-size: 760px; line-height: 1; white-space: nowrap; color: rgba(143,225,132,.055); }
+.s3-tag { position: absolute; left: 66px; top: 96px; display: inline-flex; align-items: center; height: 54px; padding: 0 26px 0 22px; border-radius: 27px; background: rgba(143,225,132,.14); color: #A8EE9E; font-size: 25px; font-weight: 700; letter-spacing: .16em; }
+.s3-tag i { display: block; width: 14px; height: 14px; border-radius: 50%; background: #8FE184; margin-right: 14px; box-shadow: 0 0 0 6px rgba(143,225,132,.25); }
+.s3-iris { position: absolute; border-radius: 50%; border: 6px solid rgba(190,255,200,.9); box-shadow: 0 0 60px rgba(130,255,160,.8), inset 0 0 60px rgba(130,255,160,.5); pointer-events: none; display: none; }
+.c-rec .th2 { width: 104px; height: 104px; border-radius: 26px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+.c-rec .th2 svg { flex: none; }
+.c-st-dot { display: inline-block; }
+
+/* ============ SCENE 4 — fertilizer recommendation ============ */
+.s4-edge { position: absolute; left: 0; width: 1080px; height: 12px; background: linear-gradient(180deg, rgba(190,255,200,0), rgba(170,255,190,.95)); filter: blur(3px); display: none; pointer-events: none; }
+.an-ring { width: 560px; height: 560px; filter: drop-shadow(0 30px 60px rgba(14,60,32,.25)); }
+.an-core { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; }
+.an-check { width: 200px; height: 200px; border-radius: 50%; background: #1FA55A; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(31,165,90,.55); }
+.an-cap { width: 880px; text-align: center; }
+.an-cap b { display: block; font-size: 48px; font-weight: 800; letter-spacing: -.01em; color: #0E2A1A; }
+.an-cap span { display: block; font-size: 29px; color: #3b4d41; margin-top: 8px; }
+.an-chip { height: 68px; padding: 0 28px 0 20px; border-radius: 34px; background: #fff; display: flex; align-items: center; gap: 12px; font-size: 30px; font-weight: 700; color: #14402a; white-space: nowrap; box-shadow: 0 16px 40px rgba(5,40,20,.28); width: 240px; justify-content: center; }
+.dv { width: 960px; height: 350px; display: flex; gap: 20px; align-items: center; padding: 30px 40px; }
+.dv-l { flex: 1; }
+.dv-t { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+.bar { display: flex; align-items: center; gap: 16px; height: 68px; }
+.bar .k { width: 50px; height: 50px; border-radius: 15px; color: #fff; font-weight: 800; font-size: 28px; display: flex; align-items: center; justify-content: center; flex: none; }
+.bar .tr { flex: 1; height: 24px; border-radius: 12px; background: #E6EEE7; overflow: hidden; }
+.bar .fl { height: 100%; border-radius: 12px; width: 0; }
+.bar .v { width: 84px; text-align: right; font-weight: 800; font-size: 31px; }
+.dv-r { position: relative; width: 240px; height: 240px; flex: none; }
+.dv-r .gc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.dv-r .gc b { font-size: 64px; font-weight: 800; color: var(--brand); line-height: 1; }
+.dv-r .gc span { font-size: 19px; font-weight: 600; color: #3b4d41; margin-top: 4px; }
+
+/* ============ SCENE 5 — brand reveal ============ */
+.s5-word { display: inline-block; }
+.s5-word .split { font-size: 150px; line-height: 1.1; font-weight: 800; color: #F2FAF3; white-space: nowrap; display: inline-block; }
+.s5-word .tani { color: #8FE184; }
+.s5-pills { left: 0; width: 1080px; top: 1480px; display: flex; justify-content: center; gap: 18px; }
+.s5-pill { height: 76px; padding: 0 28px 0 22px; border-radius: 38px; background: rgba(143,225,132,.12); border: 2px solid rgba(143,225,132,.35); color: #E6F8E8; font-size: 27px; font-weight: 600; display: flex; align-items: center; gap: 12px; white-space: nowrap; }

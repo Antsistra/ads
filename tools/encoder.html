@@ -1,0 +1,87 @@
+<!doctype html><meta charset="utf-8"><title>encoder</title>
+<script type="module">
+// Runs inside headless Chrome: PNG frames -> BT.709 I420 -> H.264 (WebCodecs), WAV -> Opus (WebCodecs).
+// Encoded chunks are streamed to Node through window.sink(kind, key, durUs, base64).
+const W = 1080, H = 1920, FPS = 30;
+const b64 = (u8) => { let s = ''; const CH = 0x8000; for (let i = 0; i < u8.length; i += CH) s += String.fromCharCode.apply(null, u8.subarray(i, i + CH)); return btoa(s); };
+
+function rgbaToI420(rgba, out) {
+  const ySize = W * H, cSize = (W / 2) * (H / 2);
+  const Y = out.subarray(0, ySize), U = out.subarray(ySize, ySize + cSize), V = out.subarray(ySize + cSize);
+  const kr = 0.2126, kb = 0.0722, kg = 1 - kr - kb;
+  for (let y = 0; y < H; y += 2) {
+    for (let x = 0; x < W; x += 2) {
+      let cb = 0, cr = 0;
+      for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) {
+        const p = ((y + dy) * W + x + dx) * 4;
+        const r = rgba[p], g = rgba[p + 1], b = rgba[p + 2];
+        const yn = kr * r + kg * g + kb * b;                      // 0..255
+        Y[(y + dy) * W + x + dx] = 16 + (219 / 255) * yn + 0.5;
+        cb += (b - yn) / 1.8556; cr += (r - yn) / 1.5748;
+      }
+      const ci = (y >> 1) * (W >> 1) + (x >> 1);
+      U[ci] = 128 + (224 / 255) * (cb / 4) + 0.5; V[ci] = 128 + (224 / 255) * (cr / 4) + 0.5;
+    }
+  }
+}
+
+window.encodeVideo = async (nFrames, bitrate) => {
+  let desc = null, err = null;
+  const enc = new VideoEncoder({
+    output: (chunk, meta) => {
+      if (meta?.decoderConfig?.description && !desc) { desc = new Uint8Array(meta.decoderConfig.description); window.sink('avcC', 0, 0, b64(desc)); }
+      const d = new Uint8Array(chunk.byteLength); chunk.copyTo(d);
+      window.sink('v', chunk.type === 'key' ? 1 : 0, chunk.duration || 0, b64(d));
+    },
+    error: (e) => { err = e; console.log('video enc error', e.message); },
+  });
+  enc.configure({ codec: 'avc1.640029', width: W, height: H, framerate: FPS, bitrate, bitrateMode: 'variable', latencyMode: 'quality', hardwareAcceleration: 'prefer-software', avc: { format: 'avc' } });
+  const cv = new OffscreenCanvas(W, H); const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const yuv = new Uint8Array(W * H * 3 / 2);
+  for (let i = 0; i < nFrames; i++) {
+    if (err) throw err;
+    const res = await fetch(`/frames/f_${String(i).padStart(4, '0')}.png`);
+    const bmp = await createImageBitmap(await res.blob(), { colorSpaceConversion: 'none' });
+    ctx.drawImage(bmp, 0, 0); bmp.close();
+    rgbaToI420(ctx.getImageData(0, 0, W, H).data, yuv);
+    const vf = new VideoFrame(yuv, { format: 'I420', codedWidth: W, codedHeight: H, timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS), colorSpace: { primaries: 'bt709', transfer: 'bt709', matrix: 'bt709', fullRange: false } });
+    enc.encode(vf, { keyFrame: i % 30 === 0 }); vf.close();
+    while (enc.encodeQueueSize > 6) await new Promise((r) => setTimeout(r, 5));
+    if (i % 100 === 0) console.log('encoded frame', i);
+  }
+  await enc.flush(); enc.close();
+  return !!desc;
+};
+
+window.encodeAudio = async (url, bitrate) => {
+  const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+  const dv = new DataView(buf.buffer);
+  let off = 12, data = null, sr = 48000, ch = 2;
+  while (off < buf.length - 8) {
+    const id = String.fromCharCode(...buf.subarray(off, off + 4)), sz = dv.getUint32(off + 4, true);
+    if (id === 'fmt ') { ch = dv.getUint16(off + 10, true); sr = dv.getUint32(off + 12, true); }
+    if (id === 'data') { data = new Int16Array(buf.buffer.slice(off + 8, off + 8 + sz)); break; }
+    off += 8 + sz + (sz & 1);
+  }
+  const total = data.length / ch;
+  let err = null;
+  const enc = new AudioEncoder({
+    output: (chunk) => { const d = new Uint8Array(chunk.byteLength); chunk.copyTo(d); window.sink('a', 0, chunk.duration || 20000, b64(d)); },
+    error: (e) => { err = e; console.log('audio enc error', e.message); },
+  });
+  enc.configure({ codec: 'opus', sampleRate: sr, numberOfChannels: ch, bitrate });
+  const FR = 960;
+  for (let s = 0; s < total; s += FR) {
+    if (err) throw err;
+    const n = Math.min(FR, total - s);
+    const pl = new Float32Array(n * ch);
+    for (let c = 0; c < ch; c++) for (let i = 0; i < n; i++) pl[c * n + i] = data[(s + i) * ch + c] / 32768;
+    const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: n, numberOfChannels: ch, timestamp: Math.round(s * 1e6 / sr), data: pl });
+    enc.encode(ad); ad.close();
+    while (enc.encodeQueueSize > 20) await new Promise((r) => setTimeout(r, 2));
+  }
+  await enc.flush(); enc.close();
+  return total;
+};
+window.__ready = true;
+</script>
