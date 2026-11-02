@@ -1,5 +1,7 @@
 // Master timeline. window.renderFrame(frame) positions every element for that exact frame.
 import * as S1 from './scenes/s1_logo.js';
+import { loadLogos } from './logo.js';
+await loadLogos();
 
 const FPS = 30;
 const stage = document.getElementById('stage');
@@ -15,7 +17,7 @@ const SCENES = [
 const optional = [
   ['s2', './scenes/s2_market.js', 3.8, 11.5],
   ['s3', './scenes/s3_ai.js', 10.9, 19.75],
-  ['s4', './scenes/s4_fertilizer.js', 19.0, 26.7],
+  ['s4', './scenes/s4_fertilizer.js', 19.0, 26.2],
   ['s5', './scenes/s5_brand.js', 26.0, 30.1],
 ];
 for (const [id, path, start, end] of optional) {
@@ -29,7 +31,7 @@ await document.fonts.ready;
 
 for (const s of SCENES) { s.api = s.mod.create(host); s.api.el.style.display = 'none'; }
 
-const FADE_START = 29.55, FADE_END = 30.0;
+const FADE_START = 29.5, FADE_END = 30.0;
 
 window.renderFrame = (frame) => {
   const t = frame / FPS;
@@ -43,8 +45,7 @@ window.renderFrame = (frame) => {
   const gx = (frame * 97) % 512, gy = (frame * 61) % 512;
   grain.style.transform = `translate(${-gx % 200}px, ${-gy % 200}px)`;
   // vignette only on dark scenes (S1 until zoom-out-to-white, S3, S5)
-  const vig = t < 3.2 ? 1 : t < 3.9 ? 1 - (t - 3.2) / 0.7 : t < 10.8 ? 0.0 : t < 11.4 ? (t - 10.8) / 0.6 : t < 18.6 ? 1 : t < 19.4 ? 1 - (t - 18.6) / 0.8 : t < 25.6 ? 0 : t < 26.4 ? (t - 25.6) / 0.8 : 1;
-  vignette.style.opacity = String(vig);
+  vignette.style.opacity = '0';
   const f = Math.min(1, Math.max(0, (t - FADE_START) / (FADE_END - FADE_START)));
   fade.style.opacity = String(f * f);
   return t;

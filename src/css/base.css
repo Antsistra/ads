@@ -42,4 +42,4 @@ canvas.fx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; 
 /* global finishing */
 #grain { position: absolute; inset: -200px; background-image: url('/assets/img/grain.png'); background-size: 512px 512px; opacity: .10; mix-blend-mode: overlay; pointer-events: none; }
 #vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 48%, rgba(0,0,0,0) 58%, rgba(0,0,0,.28) 100%); }
-#fade { position: absolute; inset: 0; background: #000; pointer-events: none; opacity: 0; }
+#fade { position: absolute; inset: 0; background: #F4F8F4; pointer-events: none; opacity: 0; }

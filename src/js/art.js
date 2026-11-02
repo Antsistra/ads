@@ -1,4 +1,5 @@
 // Vector illustrations that stand in for the app's product photography (all drawn from scratch).
+import { logoMark } from './logo.js';
 let uid = 0;
 const id = (p) => `${p}${++uid}`;
 const FONT = `font-family="NS, Noto Sans, sans-serif"`;
@@ -17,7 +18,7 @@ export function sack({ title = 'PUPUK', sub = '', w = 200, color = '#2E7D32', to
   <path d="M18 58Q100 40 182 58" fill="none" stroke="#00000022" stroke-width="2" stroke-dasharray="3 4"/>
   <rect x="30" y="76" width="140" height="134" rx="14" fill="${color}"/>
   <path d="M30 138H170" stroke="#fff" stroke-opacity=".25"/>
-  <circle cx="54" cy="98" r="11" fill="#fff"/><path d="M49 103c0-7 4-10 11-11 0 7-3 10-9 11z" fill="${color}"/>
+  <circle cx="54" cy="98" r="12.5" fill="#fff"/>${logoMark(44.5, 88.5, 19)}
   <text x="72" y="103" ${FONT} font-size="11" font-weight="700" fill="#fff" opacity=".9">Umah Tani</text>
   <text x="100" y="152" ${FONT} font-size="${title.length > 9 ? 17 : 21}" font-weight="900" fill="#fff" text-anchor="middle">${title}</text>
   <text x="100" y="172" ${FONT} font-size="11" font-weight="600" fill="#fff" text-anchor="middle" opacity=".9">${sub}</text>
@@ -129,5 +130,64 @@ export function fieldBg() {
   <rect width="960" height="330" fill="url(#fb1)"/>
   <path d="M0 118Q150 70 320 108T640 100T960 96V140H0z" fill="#5C9B50" opacity=".55"/>
   ${rows.join('')}
+  </svg>`;
+}
+
+
+// ---- seed packets for the catalogue (same pack design, different crop) ----
+const vegArt = {
+  chili: () => `${chili(80, 92, -10, 1)}${chili(118, 86, 6, 1.1)}${chili(156, 94, 20, 0.95)}${chili(100, 120, -24, 0.7)}`,
+  tomato: () => [[84, 132, 30], [132, 120, 34], [112, 160, 28], [160, 150, 26]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#E5352B"/><circle cx="${x - r * .3}" cy="${y - r * .35}" r="${r * .22}" fill="#fff" opacity=".35"/><path d="M${x - 10} ${y - r + 3}l10 7 10-7-4 9 8 2-9 4-5 8-5-8-9-4 8-2z" fill="#2F7D32"/>`).join(''),
+  spinach: () => [-38, -16, 0, 16, 38].map((a, i) => `<g transform="translate(115 205) rotate(${a})"><path d="M0 0C-26 -22 -24 -70 0 -92C24 -70 26 -22 0 0Z" fill="${['#3C9A3B', '#4FB84D', '#5BC45A', '#4FB84D', '#3C9A3B'][i]}"/><path d="M0 0V-80" stroke="#1f6b2a" stroke-opacity=".5" stroke-width="2.5"/></g>`).join(''),
+  eggplant: () => [[88, 150, -18], [134, 140, 10], [112, 170, 28]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M0 -44C20 -44 26 -4 18 30C12 52 -12 52 -18 30C-26 -4 -20 -44 0 -44Z" fill="#5B2A86"/><path d="M-8 -40c4 -4 12 -4 16 0 0 8 -3 14 -8 18-5 -4 -8 -10 -8 -18z" fill="#2F7D32"/><path d="M-9 -14C-8 8 -6 24 -5 36" stroke="#fff" stroke-opacity=".28" stroke-width="3" fill="none" stroke-linecap="round"/></g>`).join(''),
+};
+export function seedPack({ w = 230, title = 'BENIH CABAI', veg = 'chili', color = ['#8CCB4B', '#4E9E2B'], band = '#E3262B', name = 'TANGGUH F1', sub = 'Merah Keriting · Hibrida' } = {}) {
+  const g = id('pk');
+  return `<svg viewBox="0 0 230 330" width="${w}" height="${w * 330 / 230}" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="${g}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${color[0]}"/><stop offset="1" stop-color="${color[1]}"/></linearGradient></defs>
+  <ellipse cx="115" cy="322" rx="92" ry="7" fill="#000" opacity=".2"/>
+  <path d="M10 10h210v300H10z" fill="url(#${g})"/>
+  <path d="M10 10h210v14H10zM10 296h210v14H10z" fill="#000" opacity=".12"/>
+  <path d="M10 18h210M10 302h210" stroke="#fff" stroke-opacity=".35" stroke-dasharray="2 3"/>
+  <rect x="26" y="34" width="178" height="30" rx="4" fill="#fff"/>
+  <text x="115" y="55" ${FONT} font-size="15" font-weight="900" fill="${color[1]}" text-anchor="middle">${title}</text>
+  <rect x="34" y="76" width="162" height="150" rx="6" fill="#F1F6E4" stroke="#fff" stroke-width="5"/>
+  <path d="M34 160c30-30 60-20 90-6s52 6 72-10v82H34z" fill="${color[0]}" opacity=".55"/>
+  ${vegArt[veg]()}
+  <rect x="26" y="238" width="178" height="30" rx="4" fill="${band}"/>
+  <text x="115" y="259" ${FONT} font-size="17" font-weight="900" fill="#fff" text-anchor="middle">${name}</text>
+  <text x="115" y="287" ${FONT} font-size="11" font-weight="700" fill="#fff" text-anchor="middle">${sub}</text>
+  </svg>`;
+}
+
+export function abMix({ w = 170 } = {}) {
+  return `<div style="display:flex;align-items:flex-end;gap:10px">${bottle({ title: 'AB MIX A', w: w * .5, color: '#2F7FB8' })}${bottle({ title: 'AB MIX B', w: w * .5, color: '#D9822B' })}</div>`;
+}
+
+export function sprayer({ w = 210 } = {}) {
+  const g = id('sp');
+  return `<svg viewBox="0 0 220 260" width="${w}" height="${w * 260 / 220}" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="${g}" x1="0" x2="1"><stop offset="0" stop-color="#1F8A4C"/><stop offset=".45" stop-color="#4CC074"/><stop offset="1" stop-color="#1F8A4C"/></linearGradient></defs>
+  <ellipse cx="100" cy="248" rx="78" ry="7" fill="#000" opacity=".2"/>
+  <rect x="30" y="52" width="140" height="186" rx="30" fill="url(#${g})"/>
+  <rect x="64" y="36" width="72" height="22" rx="8" fill="#14532D"/>
+  <rect x="48" y="104" width="104" height="78" rx="10" fill="#fff"/>
+  <rect x="48" y="104" width="104" height="22" rx="10" fill="#14532D"/>
+  <text x="100" y="120" ${FONT} font-size="11" font-weight="800" fill="#fff" text-anchor="middle">SPRAYER 16 L</text>
+  <text x="100" y="150" ${FONT} font-size="9" font-weight="700" fill="#2E6B3C" text-anchor="middle">Elektrik · Isi Ulang</text>
+  <path d="M170 90c28 0 34 20 34 46v40" stroke="#2b2f2c" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="196" y="170" width="16" height="44" rx="6" fill="#2b2f2c"/><path d="M204 214v28" stroke="#8a8f8b" stroke-width="5" stroke-linecap="round"/>
+  <path d="M40 74c8-10 16-14 28-16" stroke="#fff" stroke-opacity=".45" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+export function hoe({ w = 230 } = {}) {
+  return `<svg viewBox="0 0 260 220" width="${w}" height="${w * 220 / 260}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="130" cy="208" rx="100" ry="7" fill="#000" opacity=".16"/>
+  <path d="M26 190 188 34" stroke="#B5814B" stroke-width="13" stroke-linecap="round"/>
+  <path d="M26 190 188 34" stroke="#D8A972" stroke-width="4" stroke-linecap="round" transform="translate(-2 -2)"/>
+  <path d="M176 22c22-14 56-10 70 12l-30 8c-4 10-12 18-22 24l-26-20c-4-8-3-18 8-24z" fill="#9AA3A0"/>
+  <path d="M184 30c16-8 38-6 50 6" stroke="#fff" stroke-opacity=".55" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M170 30l26 22" stroke="#6b726f" stroke-width="9" stroke-linecap="round"/>
   </svg>`;
 }

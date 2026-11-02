@@ -1,45 +1,115 @@
-// Umah Tani logo mark rebuilt as layered vector parts so each part can be animated independently:
-//  - two leaves (sprout) on top, dark "hill/house" body, signal rings (bottom-left), 2x2 window (top-right).
-import { svgEl } from './engine.js';
+// Official Umah Tani logo. The SVG files in /assets/logo are the single source of truth:
+// path data and colours are read from them at runtime and never redrawn or approximated.
+// Animation only moves/reveals the original paths; at rest every transform is the identity.
+export const LOGO = {};
+const NS = 'http://www.w3.org/2000/svg';
+let uidN = 0;
 
-export const BRAND = {
-  deep: '#0E4A30', brand: '#2E6B3C', leafA: '#58AE50', leafB: '#2F8040', ring1: '#6CC067', ring2: '#E9F5EA', ring3: '#3E9A4E',
-};
+function parse(text) {
+  const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+  const svg = doc.documentElement;
+  const css = svg.querySelector('style')?.textContent || '';
+  const fills = {};
+  css.replace(/\.(cls-\d+)\s*\{\s*fill:\s*(#[0-9a-fA-F]{3,8})\s*;/g, (m, c, f) => { fills[c] = f; return m; });
+  const vb = svg.getAttribute('viewBox').trim().split(/\s+/).map(Number);
+  const paths = [...svg.querySelectorAll('path')].map((p) => ({ d: p.getAttribute('d'), fill: fills[p.getAttribute('class')] || '#000' }));
+  return { vb, paths };
+}
 
-export function makeLogo({ body = BRAND.deep, ring = [BRAND.ring1, BRAND.ring2, BRAND.ring3], uid = Math.random().toString(36).slice(2, 7) } = {}) {
-  const blobD = 'M0 116V90C0 64 22 46 48 50C70 53 82 64 106 52C126 42 140 56 140 80V116Q140 140 116 140H24Q0 140 0 116Z';
-  const rad = [30, 54, 78];
-  const arcs = rad.map((r, i) => `<path class="lg-ring r${i}" pathLength="1" d="M${r} 140A${r} ${r} 0 0 0 0 ${140 - r}" fill="none" stroke="${ring[i]}" stroke-width="${i === 1 ? 6 : 8}" stroke-linecap="round" stroke-dasharray="1 1" stroke-dashoffset="0"/>`).join('');
-  const sq = [[97, 62], [111, 62], [97, 76], [111, 76]]
-    .map(([x, y], i) => `<rect class="lg-win w${i}" x="${x}" y="${y}" width="12" height="12" rx="2.6" fill="#fff"/>`).join('');
-  const svg = svgEl(`
-    <defs>
-      <clipPath id="lgclip-${uid}"><path d="${blobD}"/></clipPath>
-      <linearGradient id="lgbody-${uid}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="${body}"/><stop offset="1" stop-color="${body}"/>
-      </linearGradient>
-    </defs>
-    <g class="lg-leafB"><path d="M56 53C36 47 30 25 42 5C60 13 66 34 56 53Z" fill="${BRAND.leafB}"/><path d="M55 50C48 38 44 24 43 10" fill="none" stroke="#1B5E2C" stroke-width="1.6" stroke-linecap="round" opacity=".7"/></g>
-    <g class="lg-leafA"><path d="M58 52C53 26 76 7 121 7C123 38 97 61 58 52Z" fill="${BRAND.leafA}"/><path d="M61 49C80 37 99 24 115 11" fill="none" stroke="#2F7D3B" stroke-width="1.8" stroke-linecap="round" opacity=".75"/></g>
-    <g class="lg-blobwrap"><path class="lg-blob" d="${blobD}" fill="url(#lgbody-${uid})"/></g>
-    <g class="lg-rings" clip-path="url(#lgclip-${uid})">${arcs}</g>
-    <g class="lg-window">${sq}</g>
-  `, 'viewBox="-4 0 148 144" overflow="visible"');
-  svg.setAttribute('class', 'logo-svg');
-  svg.style.overflow = 'visible';
-  const q = (s) => svg.querySelector(s);
-  const qa = (s) => [...svg.querySelectorAll(s)];
-  return {
-    el: svg,
-    leafA: q('.lg-leafA'), leafB: q('.lg-leafB'), blob: q('.lg-blob'), blobwrap: q('.lg-blobwrap'),
-    rings: qa('.lg-ring'), wins: qa('.lg-win'), windowG: q('.lg-window'), ringsG: q('.lg-rings'),
-  };
+const ICON_ROLES = [
+  ['M76.94,138.5', 'body'], ['M88.89,140.37', 'body2'], ['M2.6,75.55c33.19', 'arcA'], ['M72.87.08', 'leaf'], ['M2.2,99.46c19.7', 'arcB'],
+  ['M28.95,36.11', 'leaf2'], ['M17.24,140.37', 'leaf3'], ['M33.49,47.68', 'dot'],
+];
+const LONG_ROLES = [
+  ['M228.1,360.62', 'body2'], ['M172.74,360.62', 'arcA'], ['M21.69,265.73', 'arcB'], ['M347.26,99.96', 'body'], ['M122.79,122.78', 'leaf'],
+  ['M89.09,117.08', 'leaf2'], ['M109.34,165.82', 'dot'], ['M46.72,329.64', 'leaf3'],
+];
+// window holes in the body (taken from the sub-paths of the official body path)
+const ICON_WINDOWS = [[99.22, 44.73, 10.17, 10.17], [119.71, 44.73, 10.17, 10.17], [99.22, 65.22, 10.17, 10.17], [119.71, 65.22, 10.17, 10.17]];
+const LONG_WINDOWS = [[252.18, 138.41, 24.07, 24.02], [299.72, 138.4, 24.07, 24.02], [252.18, 185.85, 24.07, 24.02], [299.72, 185.85, 24.07, 24.02]];
+
+function annotate(p, roles) {
+  const out = p.paths.map((pt, i) => {
+    const r = roles.find(([pre]) => pt.d.startsWith(pre));
+    return { ...pt, i, role: r ? r[1] : null };
+  });
+  return out;
+}
+
+export async function loadLogos() {
+  const [it, lt] = await Promise.all([
+    fetch('/assets/logo/umah-tani-icon.svg').then((r) => r.text()),
+    fetch('/assets/logo/umah-tani-logo-long.svg').then((r) => r.text()),
+  ]);
+  const icon = parse(it), long = parse(lt);
+  icon.items = annotate(icon, ICON_ROLES); icon.windows = ICON_WINDOWS; icon.bodyFill = icon.items.find((x) => x.role === 'body').fill;
+  long.items = annotate(long, LONG_ROLES); long.windows = LONG_WINDOWS; long.bodyFill = long.items.find((x) => x.role === 'body').fill;
+  // measure bounding boxes (needs a DOM)
+  for (const l of [icon, long]) {
+    const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', l.vb.join(' ')); s.style.cssText = 'position:absolute;left:-9999px;top:0;width:100px;height:100px';
+    const g = document.createElementNS(NS, 'g'); s.append(g);
+    const els = l.items.map((it2) => { const p = document.createElementNS(NS, 'path'); p.setAttribute('d', it2.d); g.append(p); return p; });
+    document.body.append(s);
+    l.items.forEach((it2, k) => { const b = els[k].getBBox(); it2.bb = { x: b.x, y: b.y, w: b.width, h: b.height }; });
+    const bb = g.getBBox(); l.bbox = { x: bb.x, y: bb.y, w: bb.width, h: bb.height };
+    const ib = l.items.filter((x) => x.role && x.role !== 'sliver'); // artwork only (no export slivers)
+    s.remove();
+    void ib;
+  }
+  // the wordmark of the long logo: everything that is not part of the symbol
+  for (const it2 of long.items) if (!it2.role) it2.role = it2.bb.y > 290 ? 'tag' : 'word';
+  for (const it2 of icon.items) if (!it2.role) it2.role = 'sliver';
+  LOGO.icon = icon; LOGO.long = long;
+}
+
+// Build a DOM <svg> from the official paths. Returns the element and handles to each role.
+export function buildLogo(kind = 'icon') {
+  const L = LOGO[kind];
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', L.vb.join(' ')); svg.setAttribute('xmlns', NS); svg.style.overflow = 'visible'; svg.style.display = 'block';
+  const roles = {};
+  const cid = 'bc' + (++uidN);
+  const defs = document.createElementNS(NS, 'defs'); const cp = document.createElementNS(NS, 'clipPath'); cp.setAttribute('id', cid);
+  const cr = document.createElementNS(NS, 'rect'); cr.setAttribute('x', -20); cr.setAttribute('y', -20); cr.setAttribute('width', L.vb[2] + 40); cr.setAttribute('height', L.vb[3] + 40);
+  cp.append(cr); defs.append(cp); svg.append(defs);
+  const order = ['sliver', 'body', 'body2', 'arcA', 'arcB', 'leaf', 'leaf2', 'leaf3', 'dot', 'tag', 'word'];
+  // keep original paint order
+  const parts = [];
+  for (const it of L.items) {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', it.d); p.setAttribute('fill', it.fill);
+    if (it.role === 'body') p.setAttribute('clip-path', `url(#${cid})`);
+    svg.append(p);
+    (roles[it.role] ||= []).push({ el: p, it });
+    parts.push(p);
+  }
+  // window shutters sit above the body and cover the holes until they "open"
+  const shutters = L.windows.map(([x, y, w, h]) => {
+    const r = document.createElementNS(NS, 'rect');
+    const e = 0.18 * (w / 10.17 > 1 ? 2 : 1);
+    r.setAttribute('x', x - e); r.setAttribute('y', y - e); r.setAttribute('width', w + 2 * e); r.setAttribute('height', h + 2 * e); r.setAttribute('fill', L.bodyFill);
+    r.setAttribute('clip-path', `url(#${cid})`);
+    svg.append(r); r.dataset.cx = x + w / 2; r.dataset.cy = y + h / 2;
+    return r;
+  });
+  void order;
+  // bottom-up reveal of the body (and its window covers) in symbol coordinates; p = 0..1
+  const reveal = (p) => { const H = L.vb[3] + 40; cr.setAttribute('y', (-20 + H * (1 - p)).toFixed(2)); cr.setAttribute('height', (H * p + 0.01).toFixed(2)); };
+  return { el: svg, roles, shutters, parts, vb: L.vb, bbox: L.bbox, reveal };
+}
+
+// Static markup of the official symbol (used on product packaging)
+export function logoMark(x, y, size) {
+  const L = LOGO.icon, s = size / L.vb[2];
+  return `<g transform="translate(${x} ${y}) scale(${s.toFixed(5)})">${L.items.map((it) => `<path d="${it.d}" fill="${it.fill}"/>`).join('')}</g>`;
 }
 
 // Style helper for SVG parts: transforms around their own box
 export function svgT(el, { x = 0, y = 0, s = 1, sx, sy, r = 0, o = 1, origin = '50% 50%' } = {}) {
   el.style.transformBox = 'fill-box';
   el.style.transformOrigin = origin;
-  el.style.transform = `translate(${x}px,${y}px) rotate(${r}deg) scale(${sx ?? s},${sy ?? s})`;
+  const ident = !x && !y && !r && (sx ?? s) === 1 && (sy ?? s) === 1;
+  el.style.transform = ident ? '' : `translate(${x}px,${y}px) rotate(${r}deg) scale(${sx ?? s},${sy ?? s})`;
   el.style.opacity = o >= 0.999 ? '' : String(Math.max(0, o));
+  el.style.visibility = o <= 0.002 ? 'hidden' : '';
 }

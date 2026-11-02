@@ -94,3 +94,14 @@
 .s5-word .tani { color: #8FE184; }
 .s5-pills { left: 0; width: 1080px; top: 1480px; display: flex; justify-content: center; gap: 18px; }
 .s5-pill { height: 76px; padding: 0 28px 0 22px; border-radius: 38px; background: rgba(143,225,132,.12); border: 2px solid rgba(143,225,132,.35); color: #E6F8E8; font-size: 27px; font-weight: 600; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+
+/* ============ Refined intro (S1) ============ */
+.s1-disc { position: absolute; width: 800px; height: 800px; border-radius: 50%; background: rgba(255,255,255,.62); box-shadow: 0 50px 110px rgba(8,71,54,.10), inset 0 0 0 1.5px rgba(46,107,60,.10); }
+
+/* ============ S2 catalogue ============ */
+.cat-chip { height: 84px; border-radius: 42px; background: #fff; border: 2px solid #D5E3D8; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 29px; font-weight: 600; color: #1d3326; white-space: nowrap; box-shadow: 0 8px 22px rgba(14,60,32,.08); }
+.cat-chip.on { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 14px 30px rgba(46,107,60,.35); }
+.cat-card .im { height: 250px; }
+.cat-card .tt { font-size: 30px; padding: 18px 24px 4px; min-height: 96px; }
+.cat-card .pr { padding: 0 24px 22px; font-size: 29px; }
+.cat-card .u-plus { width: 66px; height: 66px; }

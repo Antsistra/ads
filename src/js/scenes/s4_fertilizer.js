@@ -3,9 +3,9 @@ import { h, T, E, tw, pr, clamp, lerp, pulse, rng } from '../engine.js';
 import { icon } from '../icons.js';
 import * as C from '../components.js';
 import * as art from '../art.js';
-import { makeParticles } from '../fx.js';
+import { makeBg } from '../bg.js';
 
-export const DUR = 7.6;
+export const DUR = 7.2;
 const X0 = 60;
 
 const kf = (t, pts) => { // keyframes [[t,x,y],...] with eased interpolation
@@ -19,13 +19,10 @@ const kf = (t, pts) => { // keyframes [[t,x,y],...] with eased interpolation
 export function create(root) {
   const el = h('div', { class: 'scene', id: 's4' });
   const clip = h('div', { class: 'fill' });
-  const bg = h('div', { class: 'fill s2-bg' });
-  const orbA = h('div', { class: 's2-orb a' }), orbB = h('div', { class: 's2-orb b' });
-  const bigWord = h('div', { class: 's2-bigword', text: 'PUPUK PINTAR' });
-  const cv = h('canvas', { class: 'fx' });
-  const parts = makeParticles(cv, { n: 46, seed: 31, color: '60,140,70', sizeMax: 14, comp: 'source-over', bokeh: 0.5 });
+  const bgs = makeBg({});
+  const bg = bgs.el;
   const tag = h('div', { class: 's2-tag', html: '<i></i>04 · REKOMENDASI PUPUK' });
-  const head = C.kinetic([{ text: 'Pupuk tepat,' }, { text: 'dosis pas.', accent: true }], { x: 66, y: 176, size: 122, lh: 1.0 });
+  const head = C.kinetic([{ text: 'Pupuk tepat,' }, { text: 'dosis pas.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
   const edge = h('div', { class: 's4-edge' });
 
   const cam = h('div', { class: 'cam' });
@@ -116,7 +113,7 @@ export function create(root) {
   const sparks = Array.from({ length: 14 }, (_, i) => { const d = h('div', { class: 'p3 burst', style: 'left:0;top:0', html: icon(i % 2 ? 'sparkle' : 'leaf', 34, { filled: true, color: i % 2 ? '#FFC53D' : '#58AE50' }) }); world.append(d); return d; });
   const R = rng(4); const sa = sparks.map(() => R() * 6.283), sd = sparks.map(() => 160 + R() * 240);
 
-  clip.append(bg, orbA, orbB, bigWord, cv, cam, tag, head.el);
+  clip.append(bg, cam, tag, head.el);
   el.append(clip, edge);
   root.append(el);
 
@@ -139,21 +136,16 @@ export function create(root) {
   }
   const PH = { s1: 'Pilih jenis tanaman', s2: 'Pilih umur tanaman', s3: 'Masukkan luas lahan' };
 
-  function update(t) {
+  function update(t, tAbs) {
     // ---------- wipe-in
     const wp = tw(t, 0, 0.6, E.inOutSoft);
     clip.style.clipPath = wp >= 1 ? 'none' : `inset(${((1 - wp) * 100).toFixed(2)}% 0 0 0 round 90px 90px 0 0)`;
     edge.style.display = wp > 0 && wp < 1 ? 'block' : 'none';
     edge.style.top = `${((1 - wp) * 1920 - 6).toFixed(1)}px`;
 
-    // ---------- background
-    const rev = tw(t, 0, 0.8, E.cubicOut);
-    bg.style.background = 'radial-gradient(ellipse 130% 90% at 61% 39%, #F1F9F3 0%, #E6F2E9 55%, #DCEBDF 100%)';
-    T(orbA, { x: Math.sin(t * 0.5) * 60, y: Math.cos(t * 0.4) * 50, o: rev });
-    T(orbB, { x: Math.cos(t * 0.45) * 70, y: Math.sin(t * 0.35) * 60, o: rev });
-    T(bigWord, { x: lerp(100, -300, t / DUR), o: rev });
-    parts.draw(t, { alpha: 0.5, speed: 0.5, parallaxX: Math.sin(t * 0.4) * 0.5 });
-    const exitT = 6.95;
+    // ---------- background (shared system)
+    bgs.update(tAbs, { lines: 1 });
+    const exitT = 6.2;
     T(tag, { y: (1 - tw(t, 0.3, 0.8)) * -30, o: tw(t, 0.3, 0.5, E.lin) * (1 - pr(t, exitT, 0.3)) });
     head.set(t, 0.4, exitT, E);
 
@@ -232,8 +224,8 @@ export function create(root) {
     // ---------- RESULT
     RES.forEach((o) => {
       const floatY = Math.sin(t * 1.3 + o.y * 0.01) * 4 * clamp(pr(t, o.t0 + 1, 0.8));
-      const x = place(o, t, { o: 1 - exit * 0.0 });
-      x.y += floatY;
+      const x = place(o, t, { o: 1 - exit });
+      x.y += floatY - exit * 40;
       T(o.el, x);
     });
     // dosage count-up and pulse
@@ -250,15 +242,15 @@ export function create(root) {
     segEls.forEach((s, i) => { const p = E.springSoft(pr(t, 5.0 + i * 0.22, 0.5)); s.setAttribute('opacity', String(clamp(p * 4))); s.style.transformOrigin = '0 0'; });
     gauge.querySelector('.gc').style.transform = `scale(${lerp(0.6, 1, E.springSoft(pr(t, 4.95, 0.6)))})`;
     // WhatsApp press
-    const wp2 = pulse(t, 6.35, 0.25);
+    const wp2 = pulse(t, 5.6, 0.25);
     bWA.style.transform = `scale(${1 - 0.05 * wp2})`;
-    bWA.style.boxShadow = `0 0 0 ${pr(t, 6.4, 0.6) * 40}px rgba(34,208,102,${(1 - pr(t, 6.4, 0.6)) * 0.35})`;
-    if (t > 5.9 && t < 6.7) {
-      const p = clamp((t - 5.9) / 0.4);
+    bWA.style.boxShadow = `0 0 0 ${pr(t, 5.65, 0.6) * 40}px rgba(34,208,102,${(1 - pr(t, 5.65, 0.6)) * 0.35})`;
+    if (t > 5.15 && t < 5.95) {
+      const p = clamp((t - 5.15) / 0.4);
       const bz = btnO.z;
       touch.style.display = 'block';
-      T(touch, { x: 790 - 48 + (1 - E.apple(p)) * 120, y: 1756 - 48 + (1 - E.apple(p)) * 150, z: bz + 200, s: (1 - wp2 * 0.28) * E.springSoft(p), o: clamp(p * 3) * (1 - pr(t, 6.55, 0.15)) });
-      const rp = pr(t, 6.35, 0.5);
+      T(touch, { x: 790 - 48 + (1 - E.apple(p)) * 120, y: 1756 - 48 + (1 - E.apple(p)) * 150, z: bz + 200, s: (1 - wp2 * 0.28) * E.springSoft(p), o: clamp(p * 3) * (1 - pr(t, 5.8, 0.15)) });
+      const rp = pr(t, 5.6, 0.5);
       if (rp > 0 && rp < 1) T(rip, { x: 790 - 60, y: 1756 - 60, z: bz + 190, s: lerp(0.3, 1.8, E.expoOut(rp)), o: (1 - rp) * 0.7 });
     }
     // sparkles when result lands

@@ -1,23 +1,18 @@
-// SCENE 2 — Agricultural Marketplace: assemble the home UI in 3D, scroll to products, add to cart, then list & sell a harvest.
+// SCENE 2 — Agricultural Marketplace: assemble the home UI in 3D, add products to the cart, then browse the full catalogue (seeds, fertilizer, AB Mix, growing media, tools).
 import { h, T, E, tw, pr, clamp, lerp, pulse, win, fmtID } from '../engine.js';
 import { icon } from '../icons.js';
 import * as C from '../components.js';
 import * as art from '../art.js';
-import { makeParticles } from '../fx.js';
+import { makeBg } from '../bg.js';
 
 export const DUR = 7.7;
 
 export function create(root) {
   const el = h('div', { class: 'scene', id: 's2' });
-  const bg = h('div', { class: 'fill s2-bg' });
-  const orbA = h('div', { class: 's2-orb a' }), orbB = h('div', { class: 's2-orb b' });
-  const bigWord = h('div', { class: 's2-bigword', text: 'PASAR TANI' });
-  const cv = h('canvas', { class: 'fx' });
-  const pop = h('div', { class: 's2-pop' });
+  const bg = makeBg({});
   const tag = h('div', { class: 's2-tag', html: '<i></i>01 · MARKETPLACE' });
-  const headA = C.kinetic([{ text: 'Belanja' }, { text: 'kebutuhan' }, { text: 'tani.', accent: true }], { x: 66, y: 176, size: 132, lh: 1.0 });
-  const headB = C.kinetic([{ text: 'Jual hasil' }, { text: 'panenmu.', accent: true }], { x: 66, y: 176, size: 132, lh: 1.0, accent: '#E8820C' });
-  const parts = makeParticles(cv, { n: 46, seed: 5, color: '60,140,70', sizeMax: 14, comp: 'source-over', bokeh: 0.5 });
+  const headA = C.kinetic([{ text: 'Belanja' }, { text: 'kebutuhan' }, { text: 'tani.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
+  const headB = C.kinetic([{ text: 'Pupuk, benih,' }, { text: 'hingga peralatan.', accent: true }], { x: 66, y: 176, size: 104, lh: 1.02 });
 
   // ---------------- BUY world ----------------
   const camA = h('div', { class: 'cam s2-cam' });
@@ -57,44 +52,50 @@ export function create(root) {
   // touch indicator + flying thumbs
   const touch = h('div', { class: 'p3 touch' });
   worldA.append(touch);
-  const touchB = h('div', { class: 'p3 touch' });
   const thumbs = [0, 1].map((i) => { const d = h('div', { class: 'p3 fly-thumb', html: i ? art.seedPacket({ w: 54 }) : art.spinach({ w: 82 }) }); worldA.append(d); return d; });
   const rip = [0, 1].map(() => { const d = h('div', { class: 'p3 tap-rip' }); worldA.append(d); return d; });
 
-  // ---------------- SELL world ----------------
+  // ---------------- CATALOGUE world ----------------
   const camB = h('div', { class: 'cam' });
   const worldB = h('div', { class: 'world' });
   camB.append(worldB);
   const Q = [];
-  const addB = (node, bx, by, bz, t0, from = {}) => { node.classList.add('p3'); node.style.left = '0'; node.style.top = '0'; worldB.append(node); Q.push({ el: node, bx, by, bz, t0, from }); return node; };
+  const addB = (parent, node, bx, by, bz, t0, from = {}, extra = {}) => { node.classList.add('p3'); node.style.left = '0'; node.style.top = '0'; parent.append(node); const o = { el: node, bx, by, bz, t0, from, ...extra }; Q.push(o); return o; };
 
-  const statusChip = h('div', { class: 'sell-chip', html: icon('check', 26, { sw: 3, color: '#fff' }) + 'Panen Hari Ini' });
-  const crate = h('div', { class: 'abs', style: 'left:280px;top:30px', html: art.chiliCrate({ w: 400 }) });
-  const sellBtn = h('div', { class: 'f-cta', style: 'margin:0 40px', html: icon('basket', 44, { filled: true }) + '<span class="bt">Tayangkan di Pasar</span>' });
-  const stamp = h('div', { class: 'sell-stamp', html: icon('checkCircle', 64, { filled: true, color: '#fff', cut: '#1FA55A' }) + '<span>TERJUAL!</span>' });
-  const price = h('div', { class: 'sell-price', text: 'Rp 38.000' });
-  const listing = h('div', { class: 'u sell-card' },
-    h('div', { class: 'sell-im' }, crate, statusChip),
-    h('div', { class: 'sell-body' },
-      h('div', { class: 'sell-t', text: 'Cabai Merah Keriting' }),
-      h('div', { class: 'sell-meta', html: `<span>${icon('basket', 28, { filled: true })}50 kg</span><span>${icon('star', 26, { filled: true })}Grade A</span><span>${icon('shield', 28)}Segar</span>` }),
-      h('div', { class: 'sell-row' }, price, h('small', { text: '/ kg' })),
-    ), sellBtn, stamp);
-  listing.style.transformOrigin = '50% 0';
-  const headerB = addB(h('div', { class: 'u', html: '<div style="font-size:56px;font-weight:800;letter-spacing:-.02em">Jual Hasil Panen</div><div style="font-size:31px;margin-top:8px;color:#34443a">Tayangkan panenmu, pembeli datang sendiri.</div>' }), 60, 640, 40, 4.05, { dx: -300, dz: -300 });
-  addB(listing, 60, 800, 60, 4.2, { dy: 700, dz: -700, rx: 45 });
-  const toastData = [['BS', 'Bu Sari', '20 kg', 'Rp 760.000'], ['PD', 'Pak Dedi', '15 kg', 'Rp 570.000'], ['KT', 'Kios Tani Jaya', '15 kg', 'Rp 570.000']];
-  const toasts = toastData.map(([ini, n, q, p], i) => {
-    const t = h('div', { class: 'u toast', html: `<div class="av">${ini}</div><div class="tx"><b>Pesanan baru!</b><span>${n} · ${q}</span></div><div class="am">${p}</div>` });
-    return addB(t, 90, 1420 + i * 160, 220 + i * 25, 99, {});
+  // category chips
+  const chipDefs = [['Semua', 'grid', 176], ['Benih', 'sprout', 164], ['Pupuk', 'leaf', 164], ['AB Mix', 'drop', 176], ['Media Tanam', 'grass', 246], ['Peralatan', 'tools', 216]];
+  const chipX = []; let cx0 = 60; chipDefs.forEach(([, , w]) => { chipX.push(cx0); cx0 += w + 14; });
+  const chips = chipDefs.map(([n, ic, w], i) => {
+    const e = h('div', { class: 'u cat-chip', style: `width:${w}px`, html: icon(ic, 36, { filled: ic !== 'tools' && ic !== 'grass' && ic !== 'leaf', sw: 1.9 }) + `<span>${n}</span>` });
+    return addB(worldB, e, chipX[i], 660, 60, 3.95 + i * 0.07, { dy: 200, dz: -300, rx: 30 }, { chip: i });
   });
-  const revenue = h('div', { class: 'u sell-rev' }, h('small', { text: 'Total terjual hari ini' }), h('b', { text: 'Rp 0' }));
-  addB(revenue, 60, 640, 260, 99, {});
-  const revB = revenue.querySelector('b');
-  worldB.append(touchB);
-  const burst = Array.from({ length: 16 }, (_, i) => { const d = h('div', { class: 'p3 burst', html: icon(i % 3 === 0 ? 'coin' : 'leaf', 34, { filled: true, color: i % 3 === 0 ? '#FFC53D' : '#58AE50' }) }); worldB.append(d); return d; });
 
-  el.append(bg, orbA, orbB, bigWord, cv, camA, camB, tag, headA.el, headB.el, pop);
+  // product grid (scrolls)
+  const grid = h('div', { class: 'p3 g3', style: 'left:0;top:0;width:1080px;height:1920px' });
+  worldB.append(grid);
+  const prods = [
+    ['Benih Cabai Rawit Hibrida', 'Rp 28.000', '/ sachet', art.seedPack({ w: 190, title: 'BENIH CABAI', veg: 'chili', name: 'RAWIT F1', sub: 'Pedas · Hibrida' }), '#EAF2E0'],
+    ['Benih Tomat Cherry', 'Rp 22.000', '/ sachet', art.seedPack({ w: 190, title: 'BENIH TOMAT', veg: 'tomato', color: ['#F0A24A', '#D2691E'], band: '#2E7D32', name: 'CHERRY F1', sub: 'Manis · Genjah' }), '#F8EBDC'],
+    ['Pupuk NPK 16-16-16', 'Rp 38.000', '/ kg', art.sack({ title: 'NPK', sub: '16-16-16', w: 168, color: '#2D7E3B', tone: '#F1ECD9', kg: '1 KG' }), '#EFEBDD'],
+    ['Pupuk Organik Granul', 'Rp 55.000', '/ 5 kg', art.sack({ title: 'ORGANIK', sub: 'Granul Subur', w: 168, color: '#3E8E3F', kg: '5 KG' }), '#E8F0DD'],
+    ['AB Mix Sayuran', 'Rp 45.000', '/ set 5 L', art.abMix({ w: 190 }), '#E3EEF2'],
+    ['Cocopeat Blok', 'Rp 32.000', '/ blok 5 kg', art.sack({ title: 'COCOPEAT', sub: 'Media Tanam', w: 168, color: '#8B5E34', tone: '#E9DCC8', kg: '5 KG' }), '#F1E8DA'],
+    ['Sprayer Elektrik 16 L', 'Rp 389.000', '/ unit', art.sprayer({ w: 180 }), '#E7F0E9'],
+    ['Cangkul Baja Premium', 'Rp 85.000', '/ unit', art.hoe({ w: 250 }), '#F2ECE2'],
+  ];
+  const cards = prods.map(([title, price, unit, a, bgc], i) => {
+    const pc = C.prodCard({ title, price, unit, art: a, bg: bgc });
+    pc.el.classList.add('cat-card');
+    const row = i >> 1, col = i & 1;
+    const o = addB(grid, pc.el, 60 + col * 492, 790 + row * 466, 70, 4.15 + row * 0.12 + col * 0.08, { dy: 700, dz: -600, rx: 40, rz: col ? 5 : -5 }, { card: true, row, h: 430 });
+    return o;
+  });
+  const navB = addB(worldB, C.nav('home'), 60, 1736, 150, 4.5, { dy: 300, dz: -300, rx: 35 });
+  const touchB = h('div', { class: 'p3 touch', style: 'left:0;top:0' });
+  const ripB = h('div', { class: 'p3 tap-rip', style: 'left:0;top:0' });
+  worldB.append(touchB, ripB);
+
+  el.append(bg.el, camA, camB, tag, headA.el, headB.el);
   root.append(el);
 
   const posOf = (o, t) => {
@@ -107,24 +108,15 @@ export function create(root) {
     };
   };
 
-  function update(t) {
-    // ------- background
-    const reveal = tw(t, 0, 1.0, E.cubicOut);
-    bg.style.background = `radial-gradient(ellipse ${60 + reveal * 70}% ${40 + reveal * 50}% at 61% 39%, #F1F9F3 0%, #E6F2E9 55%, #DCEBDF 100%)`;
-    T(orbA, { x: Math.sin(t * 0.5) * 60, y: Math.cos(t * 0.4) * 50, o: reveal });
-    T(orbB, { x: Math.cos(t * 0.45) * 70, y: Math.sin(t * 0.35) * 60, o: reveal });
-    T(bigWord, { x: lerp(120, -260, t / DUR), y: 0, o: reveal * (1 - pr(t, 6.9, 0.5)) });
-    bigWord.textContent = t < 3.9 ? 'PASAR TANI' : 'PANEN & JUAL';
-    parts.draw(t, { alpha: 0.5 * reveal, speed: 0.5, parallaxX: Math.sin(t * 0.4) * 0.5 });
-    // iris ring on arrival (from the logo window)
-    const ir = pr(t, 0, 1.2);
-    T(pop, { x: 0, y: 0, s: lerp(0.05, 2.6, E.expoOut(ir)), o: (1 - ir) * 0.8 * (ir > 0 ? 1 : 0) });
+  function update(t, tAbs) {
+    // ------- background (shared system; identical to the intro's so the window push-through is seamless)
+    bg.update(tAbs, { lines: 1 });
 
     // ------- headline & tag
     T(tag, { y: (1 - tw(t, 0.25, 0.8)) * -30, o: tw(t, 0.25, 0.5, E.lin) * (1 - pr(t, 3.6, 0.3)) });
-    headA.set(t, 0.35, 3.65, E);
+    headA.set(t, 0.35, 3.55, E);
     headB.set(t, 4.0, 6.85, E);
-    if (t > 3.9) { tag.innerHTML = '<i></i>02 · JUAL HASIL PANEN'; tag.style.opacity = String(tw(t, 3.95, 0.5, E.lin) * (1 - pr(t, 6.8, 0.3))); }
+    if (t > 3.9) { tag.innerHTML = '<i></i>02 · KATALOG LENGKAP'; tag.style.opacity = String(tw(t, 3.95, 0.5, E.lin) * (1 - pr(t, 6.8, 0.3))); }
 
     // ------- BUY world visibility
     const buyOn = t < 4.15;
@@ -186,56 +178,53 @@ export function create(root) {
       });
     }
 
-    // ------- SELL world
+    // ------- CATALOGUE world
     if (t >= 3.7) {
       const exitB = tw(t, 6.95, 0.55, E.inOut);
       const orbit = tw(t, 3.9, 3.3, E.inOutSoft);
       worldB.style.transformOrigin = '540px 1200px';
-      worldB.style.transform = `translate3d(0,${-exitB * 60}px,${lerp(-120, 20, orbit) - exitB * 400}px) rotateX(${lerp(12, 1, orbit) + exitB * 10}deg) rotateY(${lerp(18, -8, orbit) - exitB * 24}deg)`;
+      worldB.style.transform = `translate3d(0,${-exitB * 60}px,${lerp(-120, 20, orbit) - exitB * 400}px) rotateX(${lerp(12, 1, orbit) + exitB * 10}deg) rotateY(${lerp(16, -6, orbit) - exitB * 24}deg)`;
       camB.style.opacity = String(clamp(pr(t, 3.75, 0.2)) * (1 - pr(t, 7.1, 0.3)));
-      const shrink = tw(t, 5.85, 0.7, E.inOut);
-      for (const o of Q) {
-        if (o.t0 > 90) continue;
+
+      // tabs: Benih (default) -> Pupuk (5.0) -> AB Mix (5.8) -> Peralatan (6.55)
+      const taps = [5.0, 5.8, 6.55], tabs = [2, 3, 5];
+      const active = t >= taps[2] ? tabs[2] : t >= taps[1] ? tabs[1] : t >= taps[0] ? tabs[0] : 1;
+      const scr = -466 * tw(t, taps[0] + 0.05, 0.7, E.inOutSoft) - 466 * tw(t, taps[1] + 0.05, 0.7, E.inOutSoft);
+      const rowShift = -240 * tw(t, 5.05, 0.7, E.inOutSoft);
+      grid.style.transform = `translate3d(0,${scr}px,0)`;
+      chips.forEach((o) => {
         const q = posOf(o, t);
-        if (o.el === listing) { q.y -= 70 * shrink; q.s *= 1 - 0.16 * shrink; }
-        if (o.el === headerB) q.o *= 1 - clamp(shrink * 2);
+        q.x += rowShift;
+        if (o.chip === 0) q.o *= 1 - clamp((-rowShift - 20) / 60); // first chip slides out of the left edge
         T(o.el, q);
-      }
-      // crate bob
-      crate.style.transform = `translateY(${Math.sin(t * 2.2) * 6}px) rotate(${Math.sin(t * 1.3) * 1.2}deg)`;
-      // button press at 5.55 -> "Tayang"
-      const bp = pulse(t, 5.45, 0.25);
-      sellBtn.style.transform = `scale(${1 - 0.05 * bp})`;
-      const live = t > 5.55;
-      sellBtn.style.background = live ? '#1FA55A' : '#0B6B3E';
-      sellBtn.querySelector('.bt').textContent = live ? 'Sedang Tayang' : 'Tayangkan di Pasar';
-      sellBtn.querySelector('svg').outerHTML = live ? icon('check', 44, { sw: 3.2 }) : icon('basket', 44, { filled: true });
-      statusChip.style.transform = `scale(${E.springSoft(pr(t, 4.7, 0.5))})`;
-      const tp = pr(t, 5.1, 0.35);
+        const on = o.chip === active;
+        o.el.classList.toggle('on', on);
+        const tp = taps.findIndex((ta, k) => tabs[k] === o.chip);
+        const pp = tp >= 0 ? pulse(t, taps[tp], 0.3) : 0;
+        o.el.style.transform += ` scale(${1 + 0.07 * pp})`;
+      });
+      cards.forEach((o) => {
+        const q = posOf(o, t);
+        const ys = o.by + scr;
+        q.o *= clamp((ys + o.h - 800) / 110);        // cards leave softly under the tab bar
+        // cards of the selected category lift slightly
+        const secRow = active === 2 ? [2, 3] : active === 3 ? [4, 5] : active === 5 ? [6, 7] : [0, 1];
+        const idx = cards.indexOf(o);
+        const lift = secRow.includes(idx) ? E.apple(pr(t, active === 1 ? 4.7 : taps[tabs.indexOf(active)] + 0.2, 0.7)) : 0;
+        q.z += 40 * lift; q.y += -6 * lift;
+        T(o.el, q);
+      });
+      T(navB.el, posOf(navB, t));
+
+      // touch
+      const pts = [[3.95, 880, 1100], [4.9, 520, 704], [5.55, 520, 704], [5.75, 454, 704], [6.4, 454, 704], [6.5, 924, 704], [6.9, 924, 704]];
+      const kfp = (() => { for (let i = 1; i < pts.length; i++) if (t <= pts[i][0]) { const A = pts[i - 1], B = pts[i], p = E.inOutSoft(clamp((t - A[0]) / (B[0] - A[0]))); return [lerp(A[1], B[1], p), lerp(A[2], B[2], p)]; } return [pts[pts.length - 1][1], pts[pts.length - 1][2]]; })();
+      const press = Math.max(...taps.map((ta) => pulse(t, ta, 0.22)));
+      const vis = clamp((t - 4.45) / 0.3) * (1 - pr(t, 6.85, 0.2));
       touchB.style.display = 'block';
-      T(touchB, { x: 540 - 48, y: 1480 - 48, z: 280, s: (1 - bp * 0.28) * E.springSoft(tp), o: clamp(tp * 3) * (1 - pr(t, 5.75, 0.2)) });
-      // price tick
-      price.style.transform = `scale(${1 + 0.06 * pulse(t, 5.5, 0.4)})`;
-      // toasts
-      toasts.forEach((tt, i) => {
-        const t0 = 6.05 + i * 0.4;
-        const p = E.apple(clamp((t - t0) / 0.9)), s = E.springSoft(clamp((t - t0) / 0.8));
-        T(tt, { x: 90 + (1 - p) * 700, y: 1420 + i * 160 + (1 - p) * 30, z: 240 + i * 30, ry: (1 - p) * -35, rz: (1 - p) * 4, s: lerp(0.8, 1, s), o: clamp((t - t0) / 0.15) });
-      });
-      // revenue
-      const rp = pr(t, 6.0, 1.3);
-      const val = 1900000 * E.cubicOut(rp);
-      revB.textContent = 'Rp ' + fmtID(val);
-      T(revenue, { x: 60, y: 640 + (1 - E.apple(pr(t, 6.0, 0.8))) * -40, z: 280, o: clamp((t - 6.0) / 0.25), s: 1 + 0.04 * pulse(t, 6.9, 0.4) });
-      // stamp
-      const sp = E.springHard(pr(t, 6.05, 0.6));
-      T(stamp, { x: 0, y: 0, rz: -12, s: lerp(3.2, 1, sp), o: clamp(pr(t, 6.05, 0.1)) });
-      // burst
-      burst.forEach((b, i) => {
-        const p = pr(t, 6.1, 1.1), a = (i / burst.length) * 6.283 + 0.4, d = (140 + (i % 4) * 90) * E.expoOut(p);
-        const gx = 800 + Math.cos(a) * d, gy = 1000 + Math.sin(a) * d * 0.85 + p * p * 160;
-        T(b, { x: gx, y: gy, z: 300, rz: p * (i % 2 ? 260 : -260), s: (1 - p) * (0.7 + (i % 3) * 0.25), o: p > 0 && p < 1 ? 1 : 0 });
-      });
+      T(touchB, { x: kfp[0] - 48, y: kfp[1] - 48, z: 260, s: (1 - press * 0.28), o: vis });
+      let best = null; taps.forEach((ta, k) => { const p = pr(t, ta, 0.5); if (p > 0 && p < 1) best = [p, k]; });
+      if (best) { const cxp = [510, 454, 924][best[1]]; T(ripB, { x: cxp - 60, y: 704 - 60, z: 255, s: lerp(0.3, 1.8, E.expoOut(best[0])), o: (1 - best[0]) * 0.7 }); } else T(ripB, { o: 0 });
     }
   }
   return { el, update, dur: DUR };

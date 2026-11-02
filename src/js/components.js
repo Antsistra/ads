@@ -74,8 +74,11 @@ export function kinetic(lines, { x = 72, y = 160, size = 150, lh = 1.0, weight =
   lines.forEach((ln, li) => {
     const mask = h('div', { class: 'mask', style: `padding:${size * 0.06}px ${size * 0.04}px ${size * 0.16}px;margin:-${size * 0.06}px -${size * 0.04}px -${size * 0.16}px` });
     const row = h('div', { class: 'line' });
-    ln.text.split(' ').forEach((w, wi, arr) => {
-      const s = h('span', { text: w, style: `display:inline-block;will-change:transform;${ln.accent ? `color:${ln.color || accent};` : ''}` });
+    // a line is either {text, accent} or {parts:[{text, color?, weight?}]} for mixed styling
+    const toks = ln.parts ? ln.parts.flatMap((pt) => pt.text.split(' ').map((w) => ({ w, pt }))) : ln.text.split(' ').map((w) => ({ w, pt: ln }));
+    toks.forEach(({ w, pt }, wi, arr) => {
+      const col = pt.color || (pt.accent ? accent : null);
+      const s = h('span', { text: w, style: `display:inline-block;${col ? `color:${col};` : ''}${pt.weight ? `font-weight:${pt.weight};` : ''}` });
       row.append(s); if (wi < arr.length - 1) row.append(document.createTextNode(' '));
       words.push({ s, li });
     });

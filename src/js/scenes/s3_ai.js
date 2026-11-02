@@ -3,7 +3,7 @@ import { h, T, E, tw, pr, clamp, lerp, pulse, rng } from '../engine.js';
 import { icon } from '../icons.js';
 import * as C from '../components.js';
 import * as art from '../art.js';
-import { makeParticles } from '../fx.js';
+import { makeBg } from '../bg.js';
 
 export const DUR = 8.6;
 const PX = 40, PY = 444;            // chat panel origin (screen px)
@@ -14,13 +14,10 @@ const AI_TXT = [['Itu tanda ', 0], ['serangan kutu kebul', 1], [' atau kurang un
 export function create(root) {
   const el = h('div', { class: 'scene', id: 's3' });
   const clip = h('div', { class: 'fill' });
-  const bg = h('div', { class: 'fill s3-bg' });
-  const glow = h('div', { class: 's3-glow' });
-  const bigWord = h('div', { class: 's3-bigword', text: 'TANYA TANI' });
-  const cv = h('canvas', { class: 'fx' });
-  const parts = makeParticles(cv, { n: 70, seed: 21, color: '160,245,170', sizeMax: 12 });
+  const bgs = makeBg({ dark: true });
+  const bg = bgs.el;
   const tag = h('div', { class: 's3-tag', html: '<i></i>03 · TANYA TANI AI' });
-  const head = C.kinetic([{ text: 'Tanya apa saja.' }, { text: 'Dijawab AI.', accent: true }], { x: 66, y: 178, size: 110, lh: 1.0, color: '#F2FAF3', accent: '#8FE184' });
+  const head = C.kinetic([{ text: 'Tanya apa saja.' }, { text: 'Dijawab AI.', accent: true }], { x: 66, y: 178, size: 100, lh: 1.02, color: '#F2FAF3', accent: '#8FE184' });
 
   // ---- 3D world with panel + independent layers above it
   const cam = h('div', { class: 'cam' });
@@ -104,14 +101,14 @@ export function create(root) {
   const dim = h('div', { class: 'fill', style: 'background:#021009;opacity:0;pointer-events:none' });
   const ring = h('div', { class: 's3-iris' });
 
-  clip.append(bg, glow, bigWord, cv, cam, tag, head.el, dim);
+  clip.append(bg, cam, tag, head.el, dim);
   el.append(clip, ring);
   root.append(el);
 
   const R = rng(9);
   const sparkAng = spark.map(() => R() * 6.283), sparkD = spark.map(() => 120 + R() * 160);
 
-  function update(t) {
+  function update(t, tAbs) {
     // ---------- iris open from the previous scene
     const ir = tw(t, 0, 0.7, E.inOutSoft);
     const rad = ir * 1500;
@@ -122,11 +119,8 @@ export function create(root) {
       ring.style.opacity = String(1 - ir * ir);
     } else ring.style.display = 'none';
 
-    // ---------- atmosphere
-    T(bigWord, { x: lerp(60, -420, t / DUR), o: 1 });
-    parts.draw(t, { alpha: 0.9, speed: 0.6, parallaxX: Math.sin(t * 0.4) * 0.5 });
-    const speak = pr(t, 4.0, 0.5) * (1 - pr(t, 6.0, 0.8));
-    T(glow, { s: 1 + 0.05 * Math.sin(t * 1.6) + speak * 0.1, o: 0.55 + speak * 0.45 });
+    // ---------- atmosphere (shared contour system, dark variant)
+    bgs.update(tAbs, { lines: 1 });
 
     // ---------- type
     T(tag, { y: (1 - tw(t, 0.45, 0.8)) * -30, o: tw(t, 0.45, 0.5, E.lin) * (1 - pr(t, 7.4, 0.3)) });

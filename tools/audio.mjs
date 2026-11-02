@@ -118,17 +118,16 @@ const CH = [ // D  A  Bm  G  (one bar = 2 beats * 2 = 2 s)
 ];
 const BAR = 2.0;
 
-// ---- Scene 1 (0 – 4.0): drone, logo bloom, windows, fly-through
-bass(0.0, 4.0, 26, 0.25);
-pad(0.0, 3.8, 50, 0.07); pad(0.2, 3.6, 57, 0.06); pad(0.4, 3.4, 62, 0.05);
-riser(0.2, 1.25, 120, 900, 0.1);
-boom(1.4, 0.55);
-whoosh(1.38, 1.0, { up: false, gain: 0.18 });
-[0, 1, 3, 2].forEach((k, i) => chime(1.78 + k * 0.085 + 0.02, 81 + [0, 4, 7, 12][i], 0.12, [-0.4, 0.4, -0.2, 0.2][i], 1.6));
-sparkle(1.5, 0.08, 5, 88);
-riser(2.8, 1.2, 300, 2800, 0.16);
-whoosh(3.0, 1.1, { up: true, gain: 0.5 });
-tick(2.1); tick(2.2); tick(2.3);
+// ---- Scene 1 (0 – 4.0): restrained intro: low drone, soft mark build, window-open ticks, push-through
+bass(0.0, 4.0, 26, 0.2);
+pad(0.0, 3.8, 50, 0.06); pad(0.3, 3.5, 57, 0.045); pad(0.6, 3.2, 62, 0.04);
+whoosh(0.2, 1.1, { up: true, gain: 0.12 });
+pop(0.4, 520, 0.08, -0.3); pop(0.55, 600, 0.08, 0.3);
+chime(1.25, 81, 0.11, -0.3, 2.0); chime(1.4, 88, 0.1, 0.3, 2.0);       // two leaves
+[0, 1, 3, 2].forEach((k, i) => click(1.65 + k * 0.08, 0.09, 2600 + i * 200));  // windows open
+chime(2.0, 93, 0.09, 0, 2.2);
+riser(2.7, 1.1, 300, 2400, 0.12);
+whoosh(2.85, 1.0, { up: true, gain: 0.42 });
 
 // ---- chord bed from 4.0 – 26.0
 for (let t = 4.0, bar = 0; t < 26.0 - 1e-6; t += BAR, bar++) {
@@ -152,11 +151,11 @@ for (let t = 4.0, k = 0; t < 26.0 - 1e-6; t += 0.25, k++) {
 }
 
 // ---- Scene transitions
-whoosh(3.7, 0.7, { up: false, gain: 0.45 });                    // flash into marketplace
+whoosh(3.75, 0.7, { up: false, gain: 0.3 });                    // arrive in the app
 whoosh(10.5, 0.9, { up: true, gain: 0.4 }); boom(10.9, 0.35);   // iris to AI
 whoosh(18.6, 0.9, { up: true, gain: 0.4 }); riser(18.0, 1.0, 300, 2400, 0.1);
 whoosh(18.95, 0.7, { up: false, gain: 0.4 });                   // wipe up into fertilizer
-whoosh(25.4, 0.8, { up: true, gain: 0.35 }); riser(24.9, 1.1, 250, 2600, 0.12);
+whoosh(25.2, 0.8, { up: true, gain: 0.3 });
 
 // ---- Scene 2 events (abs = 3.8 + local)
 const S2 = 3.8;
@@ -165,12 +164,9 @@ whoosh(S2 + 0.35, 1.0, { up: false, gain: 0.28 });
 whoosh(S2 + 1.95, 0.8, { up: true, gain: 0.2 });                // scroll
 click(S2 + 2.85, 0.22); pop(S2 + 2.88, 900, 0.16); click(S2 + 3.1, 0.22); pop(S2 + 3.13, 1100, 0.16);
 chime(S2 + 3.3, 88, 0.12, 0.5); chime(S2 + 3.55, 91, 0.12, 0.5);  // cart badge
-whoosh(S2 + 4.05, 0.9, { up: false, gain: 0.3 });
-for (let i = 0; i < 6; i++) pop(S2 + 4.3 + i * 0.1, 450 + i * 80, 0.06, i % 2 ? 0.4 : -0.4);
-click(S2 + 5.45, 0.25); chime(S2 + 5.55, 86, 0.14);
-stamp(S2 + 6.05);
-[0, 1, 2].forEach((i) => { chime(S2 + 6.05 + i * 0.4 + 0.15, 93 + i * 2, 0.15, [-0.5, 0.5, 0][i], 1.4); });
-for (let i = 0; i < 18; i++) tick(S2 + 6.0 + i * 0.07, 0.05);       // revenue counter
+whoosh(S2 + 4.0, 0.9, { up: false, gain: 0.3 });                // catalogue arrives
+for (let i = 0; i < 8; i++) pop(S2 + 4.15 + i * 0.1, 450 + i * 60, 0.06, i % 2 ? 0.4 : -0.4);
+[[5.0, 84], [5.8, 88], [6.55, 91]].forEach(([t, m]) => { click(S2 + t, 0.22); pop(S2 + t + 0.02, 800 + (m - 84) * 40, 0.12); chime(S2 + t + 0.08, m, 0.12, 0.2); whoosh(S2 + t + 0.05, 0.5, { up: false, gain: 0.12 }); });
 
 // ---- Scene 3 events (abs = 10.9 + local)
 const S3 = 10.9;
@@ -196,21 +192,22 @@ sparkle(S4 + 4.4, 0.1, 8, 88);
 pop(S4 + 4.35, 650, 0.16); pop(S4 + 4.6, 700, 0.16); pop(S4 + 4.9, 760, 0.15); pop(S4 + 5.1, 820, 0.15);
 for (let i = 0; i < 12; i++) tick(S4 + 4.6 + i * 0.07, 0.05);        // dosage count-up
 for (let i = 0; i < 3; i++) chime(S4 + 5.0 + i * 0.22, 79 + i * 5, 0.12, (i - 1) * 0.5, 1.2); // 3 segments
-click(S4 + 6.35, 0.25); pop(S4 + 6.37, 1000, 0.15); chime(S4 + 6.45, 98, 0.15, 0.4);
+click(S4 + 5.6, 0.25); pop(S4 + 5.62, 1000, 0.15); chime(S4 + 5.7, 98, 0.15, 0.4);
 
-// ---- Scene 5 (abs = 26.0 + local)
+// ---- Scene 5 (abs = 26.0 + local): quiet, resolved
 const S5 = 26.0;
-boom(S5 + 0.05, 0.6); whoosh(S5, 0.8, { up: false, gain: 0.45 });
-[0, 1, 2, 3].forEach((k) => chime(S5 + 1.1 + k * 0.1, 86 + [0, 4, 7, 12][k], 0.14, (k - 1.5) * 0.4, 2.0));
-for (let i = 0; i < 9; i++) pop(S5 + 1.0 + i * 0.045, 600 + i * 40, 0.06);
-sparkle(S5 + 1.1, 0.1, 7, 90);
-// tagline word hits
-const hits = [1.45, 1.65, 1.82, 2.0, 2.2]; hits.forEach((t, i) => { click(S5 + t, 0.14, 1400 + i * 120); pop(S5 + t + 0.01, 420 + i * 60, 0.09); });
-// final resolve chord (D major add9), sustained then faded by master fade
+boom(S5 + 0.05, 0.28);
+pop(S5 + 0.12, 520, 0.07, -0.3); pop(S5 + 0.25, 600, 0.07, 0.3);
+chime(S5 + 0.85, 81, 0.1, -0.3, 2.0); chime(S5 + 0.97, 88, 0.09, 0.3, 2.0);   // leaves
+[0, 1, 3, 2].forEach((k, i) => click(S5 + 1.0 + k * 0.07, 0.08, 2600 + i * 200)); // windows
+whoosh(S5 + 1.15, 0.9, { up: true, gain: 0.22 });                              // symbol widens into lockup
+for (let i = 0; i < 8; i++) tick(S5 + 1.35 + i * 0.05, 0.05);                  // letters rise
+chime(S5 + 1.9, 86, 0.11, 0, 2.2); chime(S5 + 2.0, 90, 0.09, 0.25, 2.2);       // tagline lines
+chime(S5 + 2.15, 93, 0.09, -0.25, 2.2);
+// final resolve (D major add9), then the master fade carries it out
 [50, 57, 62, 66, 69, 74].forEach((m, i) => pad(S5 + 0.1, 3.9, m, 0.06, (i - 2.5) * 0.3));
-bass(S5 + 0.1, 3.9, 26, 0.3);
-chime(S5 + 2.3, 86, 0.14, 0, 2.4); chime(S5 + 2.4, 90, 0.12, 0.3, 2.4); chime(S5 + 2.5, 93, 0.12, -0.3, 2.4);
-sparkle(S5 + 2.7, 0.08, 6, 92);
+bass(S5 + 0.1, 3.9, 26, 0.26);
+chime(S5 + 2.35, 98, 0.1, 0.2, 2.6);
 
 // ---------------------------------------------------------------- reverb (stereo Schroeder/Moorer-ish)
 function reverb(inp, delays, fb = 0.78, damp = 0.35) {
@@ -239,7 +236,7 @@ for (let i = 0; i < N; i++) { const d = 0.78 + 0.22 * duck[i]; L[i] = (dry[0][i]
 let peak = 0;
 for (let i = 0; i < N; i++) {
   const t = i / SR;
-  const fadeIn = Math.min(1, t / 0.05), fadeOut = t > 28.9 ? Math.max(0, 1 - (t - 28.9) / 1.0) : 1;
+  const fadeIn = Math.min(1, t / 0.05), fadeOut = t > 29.0 ? Math.max(0, 1 - (t - 29.0) / 1.0) : 1;
   const g = fadeIn * fadeOut;
   L[i] = Math.tanh(L[i] * 1.25) * g; Rr[i] = Math.tanh(Rr[i] * 1.25) * g;
   peak = Math.max(peak, Math.abs(L[i]), Math.abs(Rr[i]));
